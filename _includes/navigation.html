@@ -1,0 +1,10 @@
+<nav class="main-nav">
+  <ul>
+    <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>🏠 Home</a></li>
+    <li><a href="{{ '/installation/' | relative_url }}" {% if page.url contains 'installation' %}class="active"{% endif %}>📦 Installation</a></li>
+    <li><a href="{{ '/guides/' | relative_url }}" {% if page.url contains 'guides' %}class="active"{% endif %}>📚 Guides</a></li>
+    <li><a href="{{ '/api/' | relative_url }}" {% if page.url contains 'api' %}class="active"{% endif %}>🔌 API Reference</a></li>
+    <li><a href="{{ '/architecture/' | relative_url }}" {% if page.url contains 'architecture' %}class="active"{% endif %}>🏗️ Architecture</a></li>
+    <li><a href="{{ '/contributing/' | relative_url }}" {% if page.url contains 'contributing' %}class="active"{% endif %}>🤝 Contributing</a></li>
+  </ul>
+</nav>

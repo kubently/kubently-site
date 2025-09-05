@@ -4,14 +4,43 @@ title: Guides
 permalink: /guides/
 ---
 
-# Kubently Guides
-
-This section contains comprehensive guides for using Kubently in different scenarios and environments.
-
-## Getting Started
-
-- [Quick Start](quick-start.md) - Get up and running with Kubently in minutes
-- [Basic Usage](basic-usage.md) - Learn the fundamental concepts and operations
+<div class="features">
+  <div class="feature">
+    <span class="feature-icon">🚀</span>
+    <h3 class="feature-title"><a href="quick-start/">Quick Start</a></h3>
+    <p class="feature-description">Get up and running with Kubently in under 10 minutes</p>
+  </div>
+  
+  <div class="feature">
+    <span class="feature-icon">📖</span>
+    <h3 class="feature-title"><a href="basic-usage/">Basic Usage</a></h3>
+    <p class="feature-description">Learn fundamental concepts and everyday operations</p>
+  </div>
+  
+  <div class="feature">
+    <span class="feature-icon">🤖</span>
+    <h3 class="feature-title"><a href="multi-agent/">Multi-Agent Systems</a></h3>
+    <p class="feature-description">Integration with AI agents and A2A communication</p>
+  </div>
+  
+  <div class="feature">
+    <span class="feature-icon">🔒</span>
+    <h3 class="feature-title"><a href="security/">Security Guide</a></h3>
+    <p class="feature-description">Security best practices for production deployments</p>
+  </div>
+  
+  <div class="feature">
+    <span class="feature-icon">🔧</span>
+    <h3 class="feature-title"><a href="troubleshooting/">Troubleshooting</a></h3>
+    <p class="feature-description">Common issues, diagnostics, and solutions</p>
+  </div>
+  
+  <div class="feature">
+    <span class="feature-icon">⚡</span>
+    <h3 class="feature-title">Performance Tuning</h3>
+    <p class="feature-description">Optimize Kubently for your environment (coming soon)</p>
+  </div>
+</div>
 
 ## Advanced Usage
 

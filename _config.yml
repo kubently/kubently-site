@@ -2,14 +2,29 @@ title: Kubently
 description: Interactive Kubernetes Debugging System - AI-powered, real-time cluster troubleshooting
 url: "https://adickinson.github.io"
 baseurl: "/kubently-site"
+logo: "/assets/images/kubently-logo.png"
 
 markdown: kramdown
 highlighter: rouge
 kramdown:
   input: GFM
   syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    default_lang: bash
 
 theme: minima
+
+# Modern site configuration
+author: Kubently Team
+email: hello@kubently.dev
+
+# Social links
+github_username: adickinson
+twitter_username: kubently
+
+# Site colors (referenced in CSS)
+brand_color: "#2563eb"
+accent_color: "#0891b2"
 
 plugins:
   - jekyll-feed

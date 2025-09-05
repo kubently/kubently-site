@@ -8,6 +8,10 @@ permalink: /installation/
 
 This guide covers installing Kubently in various environments, from local development to production clusters.
 
+<div class="alert alert-info">
+💡 <strong>Quick Start:</strong> New to Kubently? Check out our <a href="/guides/quick-start/">Quick Start Guide</a> for the fastest way to get running!
+</div>
+
 ## Prerequisites
 
 - Kubernetes cluster (1.24+)
