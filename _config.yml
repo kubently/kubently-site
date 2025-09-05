@@ -1,0 +1,57 @@
+title: Kubently
+description: Interactive Kubernetes Debugging System - AI-powered, real-time cluster troubleshooting
+url: "https://adickinson.github.io"
+baseurl: "/kubently-site"
+
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+theme: minima
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+header_pages:
+  - index.md
+  - installation.md
+  - guides.md
+  - api.md
+  - architecture.md
+  - contributing.md
+
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "Installation"
+    url: "/installation/"
+  - title: "Guides"
+    url: "/guides/"
+    children:
+      - title: "Quick Start"
+        url: "/guides/quick-start/"
+      - title: "Multi-Agent Systems"
+        url: "/guides/multi-agent/"
+      - title: "Security"
+        url: "/guides/security/"
+      - title: "Troubleshooting"
+        url: "/guides/troubleshooting/"
+  - title: "API Reference"
+    url: "/api/"
+  - title: "Architecture"
+    url: "/architecture/"
+  - title: "Contributing"
+    url: "/contributing/"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/

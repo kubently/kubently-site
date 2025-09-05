@@ -1,0 +1,246 @@
+---
+layout: page
+title: Installation
+permalink: /installation/
+---
+
+# Installation Guide
+
+This guide covers installing Kubently in various environments, from local development to production clusters.
+
+## Prerequisites
+
+- Kubernetes cluster (1.24+)
+- Python 3.13+
+- Redis 7.0+
+- kubectl configured for your cluster
+
+## Installation Methods
+
+### Method 1: Kubernetes Manifests (Recommended)
+
+#### 1. Deploy Redis
+
+```bash
+# Clone the repository
+git clone https://github.com/adickinson/kubently.git
+cd kubently
+
+# Deploy Redis
+kubectl apply -f deployment/kubernetes/redis/
+```
+
+#### 2. Deploy the API Service
+
+```bash
+# Create namespace
+kubectl apply -f deployment/kubernetes/namespace.yaml
+
+# Create API configuration
+kubectl apply -f deployment/kubernetes/api/configmap.yaml
+
+# Deploy the API service
+kubectl apply -f deployment/kubernetes/api/deployment.yaml
+kubectl apply -f deployment/kubernetes/api/service.yaml
+
+# Optional: Deploy ingress
+kubectl apply -f deployment/kubernetes/api/ingress.yaml
+```
+
+#### 3. Deploy Agent to Target Cluster
+
+```bash
+# Generate a secure token
+export TOKEN=$(openssl rand -hex 32)
+echo "Save this token: $TOKEN"
+
+# Create the secret
+kubectl create secret generic kubently-agent-token \
+  --from-literal=token=$TOKEN \
+  -n kubently
+
+# Deploy the agent
+kubectl apply -f deployment/kubernetes/agent/serviceaccount.yaml
+kubectl apply -f deployment/kubernetes/agent/rbac.yaml
+kubectl apply -f deployment/kubernetes/agent/deployment.yaml
+
+# Verify deployment
+kubectl -n kubently logs -l app=kubently-agent
+```
+
+### Method 2: Helm Chart
+
+```bash
+# Add the Helm repository (when available)
+helm repo add kubently https://adickinson.github.io/kubently-helm-charts
+helm repo update
+
+# Install Kubently
+helm install kubently kubently/kubently \
+  --create-namespace \
+  --namespace kubently \
+  --set api.replicas=1 \
+  --set redis.enabled=true
+```
+
+### Method 3: Docker Compose (Development)
+
+```bash
+# Clone and navigate to the project
+git clone https://github.com/adickinson/kubently.git
+cd kubently
+
+# Start with Docker Compose
+docker-compose -f deployment/docker-compose.yaml up -d
+
+# Verify services are running
+docker-compose ps
+```
+
+### Method 4: Kind Cluster (Local Testing)
+
+```bash
+# Create Kind cluster
+kind create cluster --config deployment/kind-config.yaml
+
+# Deploy using the convenience script
+./deployment/scripts/kind-deploy.sh
+```
+
+## Configuration
+
+### Environment Variables
+
+#### API Service Configuration
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `KUBENTLY_REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
+| `KUBENTLY_API_PORT` | API service port | `8080` |
+| `KUBENTLY_API_KEYS` | Comma-separated API keys | Required |
+| `KUBENTLY_AGENT_TOKENS` | JSON map of cluster to tokens | Required |
+
+#### Agent Configuration
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `KUBENTLY_API_URL` | Central API URL | Required |
+| `CLUSTER_ID` | Unique cluster identifier | Required |
+| `KUBENTLY_TOKEN` | Authentication token | Required |
+| `POLL_INTERVAL` | Normal polling interval (seconds) | `10` |
+| `FAST_POLL_INTERVAL` | Active session polling (seconds) | `0.5` |
+
+### Creating Secrets
+
+#### Generate API Keys and Agent Tokens
+
+```bash
+# Generate API keys
+export API_KEY=$(openssl rand -base64 32)
+export AGENT_TOKEN=$(openssl rand -hex 32)
+
+echo "API Key: $API_KEY"
+echo "Agent Token: $AGENT_TOKEN"
+```
+
+#### Create Kubernetes Secrets
+
+```bash
+# Create API secret
+kubectl create secret generic kubently-api-config \
+  --from-literal=api-keys="$API_KEY" \
+  --from-literal=agent-tokens='{"cluster-1":"'$AGENT_TOKEN'"}' \
+  -n kubently
+
+# Create agent secret
+kubectl create secret generic kubently-agent-token \
+  --from-literal=token="$AGENT_TOKEN" \
+  -n kubently
+```
+
+## Verification
+
+### Test the Installation
+
+```bash
+# Get the API endpoint
+export API_ENDPOINT=$(kubectl get service kubently-api -n kubently -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# Create a debugging session
+curl -X POST http://$API_ENDPOINT:8080/debug/session \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"cluster_id": "cluster-1"}'
+
+# Execute a test command
+curl -X POST http://$API_ENDPOINT:8080/debug/execute \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cluster_id": "cluster-1",
+    "session_id": "session-id-from-above",
+    "command_type": "get",
+    "args": ["pods", "-A", "--limit=5"]
+  }'
+```
+
+### Health Checks
+
+```bash
+# Check API health
+curl http://$API_ENDPOINT:8080/health
+
+# Check agent logs
+kubectl logs -l app=kubently-agent -n kubently
+
+# Check Redis connection
+kubectl logs -l app=kubently-api -n kubently | grep -i redis
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Agent Not Connecting
+```bash
+# Check agent logs
+kubectl logs -l app=kubently-agent -n kubently
+
+# Verify network connectivity
+kubectl exec -it deploy/kubently-agent -n kubently -- \
+  curl -v http://kubently-api:8080/health
+```
+
+#### API Authentication Errors
+```bash
+# Verify API keys are correctly configured
+kubectl get secret kubently-api-config -n kubently -o yaml
+
+# Check API logs for authentication errors
+kubectl logs -l app=kubently-api -n kubently | grep -i auth
+```
+
+#### Redis Connection Issues
+```bash
+# Check Redis status
+kubectl get pods -l app=redis -n kubently
+
+# Test Redis connectivity
+kubectl exec -it deploy/kubently-api -n kubently -- \
+  redis-cli -h redis ping
+```
+
+## Security Considerations
+
+1. **API Keys**: Use strong, unique API keys for each client
+2. **Agent Tokens**: Generate unique tokens for each cluster
+3. **Network Security**: Consider network policies to restrict traffic
+4. **RBAC**: Review and customize the agent's Kubernetes permissions
+5. **TLS**: Enable TLS/SSL for production deployments
+
+## Next Steps
+
+- [Quick Start Guide](guides/quick-start.md) - Learn basic usage
+- [API Reference](api.md) - Explore the full API
+- [Architecture](architecture.md) - Understand the system design
+- [Security Guide](guides/security.md) - Security best practices
