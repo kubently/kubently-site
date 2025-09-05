@@ -519,7 +519,7 @@ When reporting issues, please include:
 
 ### Support Channels
 
-1. **GitHub Issues**: [Report bugs](https://github.com/adickinson/kubently/issues)
+1. **GitHub Issues**: Report bugs and request features
 2. **Documentation**: Check this troubleshooting guide
 3. **Community**: GitHub Discussions for questions
 

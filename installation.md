@@ -27,7 +27,7 @@ This guide covers installing Kubently in various environments, from local develo
 
 ```bash
 # Clone the repository
-git clone https://github.com/adickinson/kubently.git
+git clone https://github.com/your-org/kubently.git
 cd kubently
 
 # Deploy Redis
@@ -76,7 +76,7 @@ kubectl -n kubently logs -l app=kubently-agent
 
 ```bash
 # Add the Helm repository (when available)
-helm repo add kubently https://adickinson.github.io/kubently-helm-charts
+helm repo add kubently https://your-org.github.io/kubently-helm-charts
 helm repo update
 
 # Install Kubently
@@ -91,7 +91,7 @@ helm install kubently kubently/kubently \
 
 ```bash
 # Clone and navigate to the project
-git clone https://github.com/adickinson/kubently.git
+git clone https://github.com/your-org/kubently.git
 cd kubently
 
 # Start with Docker Compose

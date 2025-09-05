@@ -82,55 +82,52 @@ subtitle: Interactive Kubernetes Debugging System
 2. **Kubently Agent**: Lightweight executor deployed in each target cluster
 3. **Redis**: State store for sessions, command queues, and results
 
-## Quick Start
 
-Ready to get started? Check out our [installation guide](installation.md) or dive into the [quick start guide](guides/quick-start.md).
+  ## Use Cases
 
-## Use Cases
+  ### Interactive Debugging
+  - Real-time cluster troubleshooting through conversational interfaces
+  - Sub-second response times for kubectl commands
+  - Session-based debugging with context preservation
 
-### Interactive Debugging
-- Real-time cluster troubleshooting through conversational interfaces
-- Sub-second response times for kubectl commands
-- Session-based debugging with context preservation
+  ### Multi-Agent Systems
+  - Integration with LLM-powered agents
+  - A2A (Agent-to-Agent) communication support
+  - MCP (Model Context Protocol) tool exposure
 
-### Multi-Agent Systems
-- Integration with LLM-powered agents
-- A2A (Agent-to-Agent) communication support
-- MCP (Model Context Protocol) tool exposure
+  ### Production Operations
+  - Safe read-only cluster inspection
+  - Automated diagnostic workflows
+  - Integration with monitoring and alerting systems
 
-### Production Operations
-- Safe read-only cluster inspection
-- Automated diagnostic workflows
-- Integration with monitoring and alerting systems
+  ## Performance Metrics
 
-## Performance Metrics
-
-<div class="metrics">
-  <div class="metric">
-    <span class="metric-value">~250ms</span>
-    <span class="metric-label">Command Latency</span>
+  <div class="metrics">
+    <div class="metric">
+      <span class="metric-value">~250ms</span>
+      <span class="metric-label">Command Latency</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value">150+</span>
+      <span class="metric-label">Concurrent Sessions</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value">~70MB</span>
+      <span class="metric-label">Agent Memory</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value">~300MB</span>
+      <span class="metric-label">API Memory</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value">200/sec</span>
+      <span class="metric-label">Command Throughput</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value">99.9%</span>
+      <span class="metric-label">Uptime</span>
+    </div>
   </div>
-  <div class="metric">
-    <span class="metric-value">150+</span>
-    <span class="metric-label">Concurrent Sessions</span>
-  </div>
-  <div class="metric">
-    <span class="metric-value">~70MB</span>
-    <span class="metric-label">Agent Memory</span>
-  </div>
-  <div class="metric">
-    <span class="metric-value">~300MB</span>
-    <span class="metric-label">API Memory</span>
-  </div>
-  <div class="metric">
-    <span class="metric-value">200/sec</span>
-    <span class="metric-label">Command Throughput</span>
-  </div>
-  <div class="metric">
-    <span class="metric-value">99.9%</span>
-    <span class="metric-label">Uptime</span>
-  </div>
-</div>
 
   ## Getting Started
 
@@ -139,14 +136,14 @@ Ready to get started? Check out our [installation guide](installation.md) or div
   <div class="hero-buttons" style="margin-top: 2rem;">
     <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">🚀 Quick Start Guide</a>
     <a href="{{ '/installation/' | relative_url }}" class="btn btn-secondary">📦 Installation</a>
-    <a href="https://github.com/adickinson/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
+    <a href="https://github.com/your-org/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
   </div>
 
   ## Community & Support
 
   Join the Kubently community and get help from other users and maintainers:
 
-  - **GitHub**: [Source code and issues](https://github.com/adickinson/kubently)
+  - **GitHub**: Source code and issues
   - **Documentation**: Comprehensive guides and API reference
   - **Discussions**: Ask questions and share ideas
 

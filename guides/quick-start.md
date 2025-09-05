@@ -22,7 +22,7 @@ Before you begin, ensure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/adickinson/kubently.git
+git clone https://github.com/your-org/kubently.git
 cd kubently
 
 # Create a Kind cluster with Kubently
@@ -33,7 +33,7 @@ cd kubently
 
 ```bash
 # Clone the repository
-git clone https://github.com/adickinson/kubently.git
+git clone https://github.com/your-org/kubently.git
 cd kubently
 
 # Deploy to your cluster
