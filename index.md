@@ -11,7 +11,7 @@ subtitle: Interactive Kubernetes Debugging System
     <p class="hero-subtitle">AI-powered, real-time Kubernetes debugging system that enables interactive troubleshooting through conversational interfaces</p>
     
     <div class="badges">
-      <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+      <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache License">
       <img src="https://img.shields.io/badge/python-3.13+-blue.svg" alt="Python 3.13+">
       <img src="https://img.shields.io/badge/kubernetes-1.24+-326ce5.svg" alt="Kubernetes 1.24+">
     </div>
@@ -40,13 +40,13 @@ subtitle: Interactive Kubernetes Debugging System
     <div class="feature">
       <span class="feature-icon">🤖</span>
       <h3 class="feature-title">AI-Native Design</h3>
-      <p class="feature-description">Built for LLM and multi-agent systems with A2A communication and MCP support</p>
+      <p class="feature-description">Built for LLM and multi-agent systems with native A2A communication</p>
     </div>
     
     <div class="feature">
       <span class="feature-icon">📦</span>
       <h3 class="feature-title">Simple Deployment</h3>
-      <p class="feature-description">Single API pod with lightweight agents - deploy anywhere Kubernetes runs</p>
+      <p class="feature-description">Single API service with lightweight executors - deploy anywhere Kubernetes runs</p>
     </div>
     
     <div class="feature">
@@ -58,7 +58,7 @@ subtitle: Interactive Kubernetes Debugging System
     <div class="feature">
       <span class="feature-icon">🔌</span>
       <h3 class="feature-title">MCP Compatible</h3>
-      <p class="feature-description">Model Context Protocol support for seamless AI tool integration</p>
+      <p class="feature-description">Native API integration for AI tools and agents</p>
     </div>
   </div>
 </div>
@@ -66,7 +66,8 @@ subtitle: Interactive Kubernetes Debugging System
 ## Architecture
 
 <div class="architecture-diagram">
-  <pre><code>┌─────────────┐      ┌─────────────────┐      ┌─────────┐
+<pre>
+┌─────────────┐      ┌─────────────────┐      ┌─────────┐
 │   AI/User   │─────▶│  Kubently API   │◀────▶│  Redis  │
 │   or A2A    │ HTTP │  (Multi-Pod)    │ Pub/ │ Pub/Sub │
 │   Service   │      └─────────────────┘ Sub  └─────────┘
@@ -75,7 +76,8 @@ subtitle: Interactive Kubernetes Debugging System
                     ┌──────┴────────────┐
                     │ Kubently Executor  │
                     │   (Per Cluster)    │
-                    └────────────────────┘</code></pre>
+                    └────────────────────┘
+</pre>
 </div>
 
 ### Core Components
@@ -97,7 +99,7 @@ subtitle: Interactive Kubernetes Debugging System
   <div class="feature">
     <span class="feature-icon">🤖</span>
     <h3 class="feature-title">Multi-Agent Systems</h3>
-    <p class="feature-description">Integration with LLM-powered agents via A2A communication and MCP support</p>
+    <p class="feature-description">Integration with LLM-powered agents via native A2A communication protocol</p>
   </div>
   
   <div class="feature">
@@ -126,7 +128,7 @@ Join the Kubently community and get help from other users and maintainers:
 - **Discussions**: Ask questions and share ideas
 
 <div class="alert alert-success" style="margin-top: 2rem;">
-  🎉 <strong>Open Source & Free:</strong> Kubently is MIT licensed and completely free to use in any environment.
+  🎉 <strong>Open Source & Free:</strong> Kubently is Apache 2.0 licensed and completely free to use in any environment.
 </div>
 
 ---

@@ -160,24 +160,24 @@ class KubernetesDebugAgent(AssistantAgent):
         return response["result"]
 ```
 
-### With Model Context Protocol (MCP)
+### With Custom AI Tools
 
-Kubently exposes MCP-compatible endpoints for seamless integration:
+Kubently provides REST API endpoints for AI tool integration:
 
 ```python
-# MCP tool definition
-{
-    "name": "kubently_debug",
-    "description": "Debug Kubernetes clusters",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "cluster_id": {"type": "string"},
-            "command": {"type": "string"}
-        }
-    },
-    "endpoint": "http://kubently-api:8000/mcp/execute"
-}
+# Tool definition for AI agents
+async def kubently_debug_tool(cluster_id: str, command: str):
+    """Debug Kubernetes clusters via Kubently API"""
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "http://kubently-api:8000/debug/execute",
+            json={
+                "cluster_id": cluster_id,
+                "command": command
+            },
+            headers={"Authorization": "Bearer YOUR_API_KEY"}
+        )
+        return response.json()
 ```
 
 ## Multi-Cluster Orchestration
@@ -343,3 +343,4 @@ api:
 - [Multi-Agent Systems Guide](/guides/multi-agent/)
 - [API Reference](/api/)
 - [Security Best Practices](/guides/security/)
+- [API Integration Guide](/guides/api-integration/)

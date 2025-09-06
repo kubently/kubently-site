@@ -79,8 +79,8 @@ Comprehensive guides to help you get the most out of Kubently.
 <div class="features">
   <div class="feature">
     <span class="feature-icon">🔗</span>
-    <h3 class="feature-title"><a href="/guides/mcp-integration/">MCP Integration</a></h3>
-    <p class="feature-description">Use Model Context Protocol for AI tool integration</p>
+    <h3 class="feature-title"><a href="/guides/api-integration/">API Integration</a></h3>
+    <p class="feature-description">Integrate Kubently with external tools and services</p>
   </div>
   
   <div class="feature">

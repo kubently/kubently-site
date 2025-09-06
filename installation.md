@@ -138,9 +138,9 @@ kind create cluster --config deployment/kind-config.yaml
 | `KUBENTLY_REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
 | `KUBENTLY_API_PORT` | API service port | `8080` |
 | `KUBENTLY_API_KEYS` | Comma-separated API keys | Required |
-| `KUBENTLY_AGENT_TOKENS` | JSON map of cluster to tokens | Required |
+| `KUBENTLY_EXECUTOR_TOKENS` | JSON map of cluster to tokens | Required |
 
-#### Agent Configuration
+#### Executor Configuration
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -152,15 +152,15 @@ kind create cluster --config deployment/kind-config.yaml
 
 ### Creating Secrets
 
-#### Generate API Keys and Agent Tokens
+#### Generate API Keys and Executor Tokens
 
 ```bash
 # Generate API keys
 export API_KEY=$(openssl rand -base64 32)
-export AGENT_TOKEN=$(openssl rand -hex 32)
+export EXECUTOR_TOKEN=$(openssl rand -hex 32)
 
 echo "API Key: $API_KEY"
-echo "Agent Token: $AGENT_TOKEN"
+echo "Executor Token: $EXECUTOR_TOKEN"
 ```
 
 #### Create Kubernetes Secrets
@@ -169,12 +169,12 @@ echo "Agent Token: $AGENT_TOKEN"
 # Create API secret
 kubectl create secret generic kubently-api-config \
   --from-literal=api-keys="$API_KEY" \
-  --from-literal=agent-tokens='{"cluster-1":"'$AGENT_TOKEN'"}' \
+  --from-literal=executor-tokens='{"cluster-1":"'$EXECUTOR_TOKEN'"}' \
   -n kubently
 
-# Create agent secret
-kubectl create secret generic kubently-agent-token \
-  --from-literal=token="$AGENT_TOKEN" \
+# Create executor secret
+kubectl create secret generic kubently-executor-token \
+  --from-literal=token="$EXECUTOR_TOKEN" \
   -n kubently
 ```
 
@@ -210,8 +210,8 @@ curl -X POST http://$API_ENDPOINT:8080/debug/execute \
 # Check API health
 curl http://$API_ENDPOINT:8080/health
 
-# Check agent logs
-kubectl logs -l app=kubently-agent -n kubently
+# Check executor logs
+kubectl logs -l app=kubently-executor -n kubently
 
 # Check Redis connection
 kubectl logs -l app=kubently-api -n kubently | grep -i redis
@@ -221,13 +221,13 @@ kubectl logs -l app=kubently-api -n kubently | grep -i redis
 
 ### Common Issues
 
-#### Agent Not Connecting
+#### Executor Not Connecting
 ```bash
-# Check agent logs
-kubectl logs -l app=kubently-agent -n kubently
+# Check executor logs
+kubectl logs -l app=kubently-executor -n kubently
 
 # Verify network connectivity
-kubectl exec -it deploy/kubently-agent -n kubently -- \
+kubectl exec -it deploy/kubently-executor -n kubently -- \
   curl -v http://kubently-api:8080/health
 ```
 
@@ -253,9 +253,9 @@ kubectl exec -it deploy/kubently-api -n kubently -- \
 ## Security Considerations
 
 1. **API Keys**: Use strong, unique API keys for each client
-2. **Agent Tokens**: Generate unique tokens for each cluster
+2. **Executor Tokens**: Generate unique tokens for each cluster
 3. **Network Security**: Consider network policies to restrict traffic
-4. **RBAC**: Review and customize the agent's Kubernetes permissions
+4. **RBAC**: Review and customize the executor's Kubernetes permissions
 5. **TLS**: Enable TLS/SSL for production deployments
 
 ## Next Steps
