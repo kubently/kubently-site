@@ -1,6 +1,6 @@
 # Kubently Documentation Site
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://adickinson72.github.io/kubently-site/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://kubently.io)
 [![Jekyll](https://img.shields.io/badge/Jekyll-4.3-red)](https://jekyllrb.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -8,7 +8,7 @@ Modern documentation website for Kubently - the AI-powered, real-time Kubernetes
 
 ## 🌟 Live Site
 
-**Visit the live documentation:** [https://adickinson72.github.io/kubently-site/](https://adickinson72.github.io/kubently-site/)
+**Visit the live documentation:** [https://kubently.io](https://kubently.io)
 
 ## 🎨 Features
 
@@ -33,7 +33,7 @@ bundle install
 bundle exec jekyll serve
 ```
 
-Visit `http://localhost:4000/kubently-site/` to view the site locally.
+Visit `http://localhost:4000/` to view the site locally.
 
 ## 📁 Site Structure
 

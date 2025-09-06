@@ -6,6 +6,7 @@ subtitle: Interactive Kubernetes Debugging System
 
 <div class="hero">
   <div class="hero-content">
+    <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 120px; margin-bottom: 1.5rem;">
     <h1 class="hero-title">Kubently</h1>
     <p class="hero-subtitle">AI-powered, real-time Kubernetes debugging system that enables interactive troubleshooting through conversational interfaces</p>
     
