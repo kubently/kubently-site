@@ -27,6 +27,17 @@ body {
   background-color: white;
 }
 
+// Wider content wrapper
+.wrapper {
+  max-width: 1400px !important;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.page-content .wrapper {
+  max-width: 1400px !important;
+}
+
 // Headers
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
@@ -111,8 +122,14 @@ h2 {
   border-bottom: 1px solid var(--border-color);
 
   .hero-content {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
+    
+    img {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
   }
 
   .hero-title {
@@ -280,18 +297,31 @@ table {
 
 // Architecture Diagram
 .architecture-diagram {
-  background: var(--light-gray);
+  background: #f8fafc;
   border-radius: 1rem;
-  padding: 2rem;
-  margin: 2rem 0;
+  padding: 2.5rem;
+  margin: 3rem auto;
   text-align: center;
   border: 1px solid var(--border-color);
+  max-width: 900px;
+  overflow-x: auto;
 
   pre {
     background: white !important;
-    color: var(--dark-blue);
-    border: 1px solid var(--border-color);
-    font-size: 0.875rem;
+    color: var(--dark-blue) !important;
+    border: 2px solid var(--border-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    padding: 2rem !important;
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+    overflow-x: auto;
+    white-space: pre;
+    
+    code {
+      background: transparent !important;
+      color: var(--dark-blue) !important;
+      font-size: 0.9rem;
+    }
   }
 }
 
