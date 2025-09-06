@@ -60,6 +60,7 @@ subtitle: Interactive Kubernetes Debugging System
       <p class="feature-description">Model Context Protocol support for seamless AI tool integration</p>
     </div>
   </div>
+</div>
 
 ## Architecture
 
@@ -79,78 +80,51 @@ subtitle: Interactive Kubernetes Debugging System
 ### Core Components
 
 1. **Kubently API**: FastAPI service managing sessions and command orchestration
-2. **Kubently Agent**: Lightweight executor deployed in each target cluster
+2. **Kubently Agent**: Lightweight executor deployed in each target cluster  
 3. **Redis**: State store for sessions, command queues, and results
 
+## Use Cases
 
-  ## Use Cases
-
-  ### Interactive Debugging
-  - Real-time cluster troubleshooting through conversational interfaces
-  - Sub-second response times for kubectl commands
-  - Session-based debugging with context preservation
-
-  ### Multi-Agent Systems
-  - Integration with LLM-powered agents
-  - A2A (Agent-to-Agent) communication support
-  - MCP (Model Context Protocol) tool exposure
-
-  ### Production Operations
-  - Safe read-only cluster inspection
-  - Automated diagnostic workflows
-  - Integration with monitoring and alerting systems
-
-  ## Performance Metrics
-
-  <div class="metrics">
-    <div class="metric">
-      <span class="metric-value">~250ms</span>
-      <span class="metric-label">Command Latency</span>
-    </div>
-    <div class="metric">
-      <span class="metric-value">150+</span>
-      <span class="metric-label">Concurrent Sessions</span>
-    </div>
-    <div class="metric">
-      <span class="metric-value">~70MB</span>
-      <span class="metric-label">Agent Memory</span>
-    </div>
-    <div class="metric">
-      <span class="metric-value">~300MB</span>
-      <span class="metric-label">API Memory</span>
-    </div>
-    <div class="metric">
-      <span class="metric-value">200/sec</span>
-      <span class="metric-label">Command Throughput</span>
-    </div>
-    <div class="metric">
-      <span class="metric-value">99.9%</span>
-      <span class="metric-label">Uptime</span>
-    </div>
+<div class="features">
+  <div class="feature">
+    <span class="feature-icon">💬</span>
+    <h3 class="feature-title">Interactive Debugging</h3>
+    <p class="feature-description">Real-time cluster troubleshooting through conversational interfaces with context preservation</p>
   </div>
-
-  ## Getting Started
-
-  Ready to start debugging your Kubernetes clusters with AI-powered insights?
-
-  <div class="hero-buttons" style="margin-top: 2rem;">
-    <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">🚀 Quick Start Guide</a>
-    <a href="{{ '/installation/' | relative_url }}" class="btn btn-secondary">📦 Installation</a>
-    <a href="https://github.com/your-org/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
+  
+  <div class="feature">
+    <span class="feature-icon">🤖</span>
+    <h3 class="feature-title">Multi-Agent Systems</h3>
+    <p class="feature-description">Integration with LLM-powered agents via A2A communication and MCP support</p>
   </div>
-
-  ## Community & Support
-
-  Join the Kubently community and get help from other users and maintainers:
-
-  - **GitHub**: Source code and issues
-  - **Documentation**: Comprehensive guides and API reference
-  - **Discussions**: Ask questions and share ideas
-
-  <div class="alert alert-success" style="margin-top: 2rem;">
-    🎉 <strong>Open Source & Free:</strong> Kubently is MIT licensed and completely free to use in any environment.
+  
+  <div class="feature">
+    <span class="feature-icon">🏢</span>
+    <h3 class="feature-title">Production Operations</h3>
+    <p class="feature-description">Safe read-only cluster inspection with automated diagnostic workflows</p>
   </div>
+</div>
 
+## Getting Started
+
+Ready to start debugging your Kubernetes clusters with AI-powered insights?
+
+<div class="hero-buttons" style="margin-top: 2rem;">
+  <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">🚀 Quick Start Guide</a>
+  <a href="{{ '/installation/' | relative_url }}" class="btn btn-secondary">📦 Installation</a>
+  <a href="https://github.com/your-org/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
+</div>
+
+## Community & Support  
+
+Join the Kubently community and get help from other users and maintainers:
+
+- **GitHub**: Source code and issues
+- **Documentation**: Comprehensive guides and API reference
+- **Discussions**: Ask questions and share ideas
+
+<div class="alert alert-success" style="margin-top: 2rem;">
+  🎉 <strong>Open Source & Free:</strong> Kubently is MIT licensed and completely free to use in any environment.
 </div>
 
 ---
