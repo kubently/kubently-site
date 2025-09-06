@@ -28,7 +28,7 @@ subtitle: Interactive Kubernetes Debugging System
     <div class="feature">
       <span class="feature-icon">🚀</span>
       <h3 class="feature-title">Real-time Debugging</h3>
-      <p class="feature-description">Sub-second command execution latency during active sessions with dynamic polling optimization</p>
+      <p class="feature-description">~50ms command delivery via Server-Sent Events (SSE) with instant execution</p>
     </div>
     
     <div class="feature">
@@ -52,7 +52,7 @@ subtitle: Interactive Kubernetes Debugging System
     <div class="feature">
       <span class="feature-icon">⚡</span>
       <h3 class="feature-title">Auto-scaling Performance</h3>
-      <p class="feature-description">Dynamic polling rates based on session activity for optimal resource usage</p>
+      <p class="feature-description">Horizontal scaling with Redis pub/sub - supports unlimited API pods</p>
     </div>
     
     <div class="feature">
@@ -67,22 +67,23 @@ subtitle: Interactive Kubernetes Debugging System
 
 <div class="architecture-diagram">
   <pre><code>┌─────────────┐      ┌─────────────────┐      ┌─────────┐
-│   AI/User   │─────▶│   Kubently API  │◀────▶│  Redis  │
-│   or A2A    │ HTTP │   (Single Pod)   │      └─────────┘
-│   Service   │      └─────────────────┘
-└─────────────┘            ▲ HTTP
-                           │ (Long Polling)
-                    ┌──────┴────────┐
-                    │ Kubently Agent │
-                    │  (Per Cluster) │
-                    └────────────────┘</code></pre>
+│   AI/User   │─────▶│  Kubently API   │◀────▶│  Redis  │
+│   or A2A    │ HTTP │  (Multi-Pod)    │ Pub/ │ Pub/Sub │
+│   Service   │      └─────────────────┘ Sub  └─────────┘
+└─────────────┘            ▲ SSE
+                           │ (Server-Sent Events)
+                    ┌──────┴────────────┐
+                    │ Kubently Executor  │
+                    │   (Per Cluster)    │
+                    └────────────────────┘</code></pre>
 </div>
 
 ### Core Components
 
-1. **Kubently API**: FastAPI service managing sessions and command orchestration
-2. **Kubently Agent**: Lightweight executor deployed in each target cluster  
-3. **Redis**: State store for sessions, command queues, and results
+1. **Kubently API**: Horizontally scalable FastAPI service managing sessions and command orchestration
+2. **Kubently Executor**: SSE-connected component deployed in each target cluster  
+3. **Redis**: Pub/Sub for command distribution and state storage
+4. **SSE Connection**: Real-time streaming for instant command delivery (no polling)
 
 ## Use Cases
 

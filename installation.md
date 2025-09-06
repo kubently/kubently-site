@@ -15,15 +15,75 @@ This guide covers installing Kubently in various environments, from local develo
 ## Prerequisites
 
 - Kubernetes cluster (1.24+)
-- Python 3.13+
-- Redis 7.0+
-- kubectl configured for your cluster
+- kubectl configured
+- Helm 3.x installed (recommended)
+- Docker for building images (optional)
 
 ## Installation Methods
 
-### Method 1: Kubernetes Manifests (Recommended)
+### Method 1: Helm Chart (Recommended)
 
-#### 1. Deploy Redis
+#### Quick Install
+
+```bash
+# Add Redis dependency
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# Create namespace
+kubectl create namespace kubently
+
+# Deploy Kubently with default settings
+helm install kubently ./deployment/helm/kubently \
+  --namespace kubently \
+  --set api.image.tag=sse \
+  --set executor.image.tag=sse
+```
+
+#### Production Install
+
+```bash
+# Generate secure API key
+export API_KEY=$(openssl rand -hex 32)
+
+# Create values file
+cat > values-prod.yaml <<EOF
+api:
+  replicaCount: 3  # Horizontal scaling
+  image:
+    repository: kubently/api
+    tag: sse
+  resources:
+    requests:
+      cpu: 250m
+      memory: 384Mi
+    limits:
+      cpu: 1000m
+      memory: 768Mi
+
+executor:
+  image:
+    repository: kubently/executor
+    tag: sse
+  env:
+    EXECUTOR_TYPE: sse  # Use SSE for instant delivery
+    LOG_LEVEL: INFO
+
+redis:
+  enabled: true
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+EOF
+
+# Deploy with production values
+helm upgrade --install kubently ./deployment/helm/kubently \
+  --namespace kubently \
+  --values values-prod.yaml
+```
+
+### Method 2: Kubernetes Manifests
 
 ```bash
 # Clone the repository
@@ -32,59 +92,15 @@ cd kubently
 
 # Deploy Redis
 kubectl apply -f deployment/kubernetes/redis/
-```
 
-#### 2. Deploy the API Service
+# Deploy the API service (with SSE support)
+kubectl apply -f deployment/kubernetes/api/
 
-```bash
-# Create namespace
-kubectl apply -f deployment/kubernetes/namespace.yaml
-
-# Create API configuration
-kubectl apply -f deployment/kubernetes/api/configmap.yaml
-
-# Deploy the API service
-kubectl apply -f deployment/kubernetes/api/deployment.yaml
-kubectl apply -f deployment/kubernetes/api/service.yaml
-
-# Optional: Deploy ingress
-kubectl apply -f deployment/kubernetes/api/ingress.yaml
-```
-
-#### 3. Deploy Agent to Target Cluster
-
-```bash
-# Generate a secure token
-export TOKEN=$(openssl rand -hex 32)
-echo "Save this token: $TOKEN"
-
-# Create the secret
-kubectl create secret generic kubently-agent-token \
-  --from-literal=token=$TOKEN \
-  -n kubently
-
-# Deploy the agent
-kubectl apply -f deployment/kubernetes/agent/serviceaccount.yaml
-kubectl apply -f deployment/kubernetes/agent/rbac.yaml
-kubectl apply -f deployment/kubernetes/agent/deployment.yaml
+# Deploy the Executor 
+kubectl apply -f deployment/kubernetes/executor/
 
 # Verify deployment
-kubectl -n kubently logs -l app=kubently-agent
-```
-
-### Method 2: Helm Chart
-
-```bash
-# Add the Helm repository (when available)
-helm repo add kubently https://your-org.github.io/kubently-helm-charts
-helm repo update
-
-# Install Kubently
-helm install kubently kubently/kubently \
-  --create-namespace \
-  --namespace kubently \
-  --set api.replicas=1 \
-  --set redis.enabled=true
+kubectl get pods -n kubently
 ```
 
 ### Method 3: Docker Compose (Development)

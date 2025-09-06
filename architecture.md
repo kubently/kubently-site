@@ -6,95 +6,114 @@ permalink: /architecture/
 
 # Architecture
 
-Kubently is designed as a distributed system that provides real-time, secure access to Kubernetes cluster debugging capabilities through a simple API interface.
+Kubently follows a modular, black-box architecture where each component exposes only its public interface while hiding implementation details. This design enables independent development, testing, and replacement of components without affecting the overall system.
 
 ## System Overview
 
+### High-Level Architecture
+
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   AI Agents     │    │    Users        │    │  External       │
-│   or Services   │    │                 │    │  Monitoring     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Kubently API Gateway                        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
-│  │    Auth     │  │   Session   │  │      Command            │ │
-│  │   Module    │  │   Manager   │  │      Router             │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+│                         External Clients                         │
+│                   (AI Services, CLI, Web UI, A2A)               │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │ HTTPS
+                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Kubernetes Ingress/LB                        │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │ Round-robin distribution
+                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      Kubently API Pods                           │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │  Pod 1   │  │  Pod 2   │  │  Pod 3   │  │  Pod N   │  ...  │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘       │
+│       └──────────────┴──────────────┴──────────────┘            │
+│                   Redis Pub/Sub Channel                          │
+└──────────────────────────────┬──────────────────────────────────┘
                                │
+                  ┌────────────▼────────────┐
+                  │      Redis Cluster       │
+                  │    (Pub/Sub + State)     │
+                  └────────────┬────────────┘
+                               │ SSE Connection
                                ▼
-                    ┌─────────────────┐
-                    │      Redis      │
-                    │   State Store   │
-                    └─────────────────┘
-                               ▲
-                               │ (Pub/Sub + Polling)
-        ┌──────────────────────┼──────────────────────┐
-        │                      │                      │
-        ▼                      ▼                      ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Cluster   │    │   Cluster   │    │   Cluster   │
-│   Agent A   │    │   Agent B   │    │   Agent C   │
-└─────────────┘    └─────────────┘    └─────────────┘
-        │                      │                      │
-        ▼                      ▼                      ▼
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Kubernetes  │    │ Kubernetes  │    │ Kubernetes  │
-│  Cluster A  │    │  Cluster B  │    │  Cluster C  │
-└─────────────┘    └─────────────┘    └─────────────┘
+                  ┌──────────────────────────┐
+                  │   Kubently Executors      │
+                  │  (One per K8s cluster)    │
+                  └──────────────────────────┘
 ```
+
+### Design Principles
+
+1. **Black Box Modules**: Each module exposes only its interface, hiding implementation
+2. **Primitive-First**: Everything flows through three core primitives: Command, Session, and Result
+3. **Single Responsibility**: Each module has one clear job that one person can maintain
+4. **Interface Stability**: APIs remain stable even if implementations change completely
+5. **Replaceable Components**: Any module can be rewritten using only its public API
 
 ## Core Components
 
-### Kubently API (Central Service)
+### Kubently API (Horizontally Scalable)
 
-The API service is the central orchestration point that handles all external requests and coordinates with cluster agents.
+The API service orchestrates debugging sessions and command execution across multiple pods.
 
-**Key Responsibilities:**
-- Authentication and authorization
-- Session lifecycle management
-- Command routing and queuing
-- Result aggregation and caching
-- Rate limiting and security controls
+**Key Features:**
+- **Horizontal Scaling**: Multiple pods with Redis pub/sub distribution
+- **SSE Endpoint**: Real-time executor streaming via Server-Sent Events
+- **A2A Support**: Built-in A2A server on port 8000 for multi-agent systems
+- **Stateless Design**: All state in Redis for perfect scaling
 
-**Technology Stack:**
-- **Framework**: FastAPI (Python)
-- **Authentication**: JWT tokens and API keys
-- **Serialization**: Pydantic models
-- **Async Support**: Full async/await support
-
-**Scalability:**
-- Stateless design allows horizontal scaling
-- Redis handles all state persistence
-- Load balancer compatible
-
-### Kubently Agent (Per-Cluster)
-
-Lightweight agents deployed in each target cluster that execute kubectl commands and report results back to the API.
-
-**Key Responsibilities:**
-- Secure kubectl command execution
-- Command validation and filtering
-- Result streaming back to API
-- Health status reporting
-
-**Security Features:**
-- Read-only kubectl permissions via RBAC
-- Command whitelist validation
-- No persistent storage of sensitive data
-- Outbound-only network connections
+**Endpoints:**
+- `GET /executor/stream` - SSE connection for executors
+- `POST /debug/execute` - Execute kubectl commands
+- `POST /debug/session` - Create debugging session
+- `POST /executor/results` - Receive command results
+- `GET /health` - Health check
 
 **Performance:**
-- Sub-second command execution
-- Dynamic polling based on activity
-- Memory footprint < 100MB
+- ~50ms command delivery via SSE
+- Supports 1000+ commands/sec
+- Unlimited API pod replicas
 
-### Redis State Store
+### Kubently Executor (Per-Cluster)
 
-Redis serves as the central state store for all session data, command queues, and results.
+SSE-connected component deployed in each target cluster for instant command execution.
+
+**Key Features:**
+- **SSE Client**: Instant command reception (no polling)
+- **Dynamic Whitelist**: Configurable security modes
+- **Auto-reconnection**: Resilient connection handling
+- **Token Authentication**: Secure cluster identification
+
+**Security Modes:**
+- `readOnly`: Safe read operations only (default)
+- `extendedReadOnly`: Includes auth/certificate operations
+- `fullAccess`: All operations (requires explicit acknowledgment)
+
+**Performance:**
+- Instant command delivery via SSE
+- Zero polling overhead
+- Memory footprint < 128MB
+- Automatic connection recovery
+
+### Redis (Pub/Sub + State)
+
+Redis handles message distribution and state management for the entire system.
+
+**Usage:**
+- **Pub/Sub Channels**: Command distribution to executors
+- **Session State**: Active debugging sessions with metadata
+- **Command Queues**: Per-cluster command queues
+- **Results Cache**: Command execution results
+- **TTL Management**: Automatic cleanup of expired data
+
+**Channel Format:**
+```
+executor-commands:{cluster_id}  # Commands for specific executor
+executor-results:{command_id}   # Command results
+```
 
 **Data Types Stored:**
 - **Sessions**: Active debugging sessions with metadata
