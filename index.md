@@ -66,18 +66,7 @@ subtitle: Interactive Kubernetes Debugging System
 ## Architecture
 
 <div class="architecture-diagram">
-<pre>
-┌─────────────┐      ┌─────────────────┐      ┌─────────┐
-│   AI/User   │─────▶│  Kubently API   │◀────▶│  Redis  │
-│   or A2A    │ HTTP │  (Multi-Pod)    │ Pub/ │ Pub/Sub │
-│   Service   │      └─────────────────┘ Sub  └─────────┘
-└─────────────┘            ▲ SSE
-                           │ (Server-Sent Events)
-                    ┌──────┴────────────┐
-                    │ Kubently Executor  │
-                    │   (Per Cluster)    │
-                    └────────────────────┘
-</pre>
+  <img src="{{ '/assets/images/architecture-diagram.svg' | relative_url }}" alt="Kubently Architecture Diagram" style="max-width: 100%; height: auto;">
 </div>
 
 ### Core Components
