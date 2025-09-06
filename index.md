@@ -57,8 +57,8 @@ subtitle: Interactive Kubernetes Debugging System
     
     <div class="feature">
       <span class="feature-icon">🔌</span>
-      <h3 class="feature-title">MCP Compatible</h3>
-      <p class="feature-description">Native API integration for AI tools and agents</p>
+      <h3 class="feature-title">API Integration</h3>
+      <p class="feature-description">Native REST API for AI tools and external services</p>
     </div>
   </div>
 </div>
