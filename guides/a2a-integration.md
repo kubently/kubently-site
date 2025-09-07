@@ -175,7 +175,7 @@ async def kubently_debug_tool(cluster_id: str, command: str):
                 "cluster_id": cluster_id,
                 "command": command
             },
-            headers={"Authorization": "Bearer YOUR_API_KEY"}
+            headers={"X-API-Key": "YOUR_API_KEY"}
         )
         return response.json()
 ```

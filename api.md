@@ -16,11 +16,22 @@ http://your-kubently-api:8080
 
 ## Authentication
 
-All API requests require authentication via API key in the `Authorization` header:
+Kubently uses a deliberate dual-header authentication strategy:
 
+### Client Authentication (External APIs)
+External clients (CLI, A2A services) use the `X-API-Key` header:
 ```http
-Authorization: Bearer your-api-key-here
+X-API-Key: your-api-key-here
 ```
+
+### Executor Authentication (Internal)
+Internal executors connecting from clusters use the standard Authorization header:
+```http
+Authorization: Bearer executor-token-here
+X-Cluster-ID: cluster-name
+```
+
+This separation allows future OIDC/JWT implementation for human users without conflicting with machine-to-machine authentication.
 
 ## Endpoints
 
@@ -372,13 +383,13 @@ try {
 ```bash
 # Create a debug session
 curl -X POST http://your-kubently-api:8080/debug/session \
-  -H "Authorization: Bearer your-api-key" \
+  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"cluster_id": "production-cluster"}'
 
 # Execute a kubectl command
 curl -X POST http://your-kubently-api:8080/debug/execute \
-  -H "Authorization: Bearer your-api-key" \
+  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "production-cluster",
@@ -389,7 +400,7 @@ curl -X POST http://your-kubently-api:8080/debug/execute \
 
 # Close the session
 curl -X DELETE http://your-kubently-api:8080/debug/session/sess_abc123def456 \
-  -H "Authorization: Bearer your-api-key"
+  -H "X-API-Key: your-api-key"
 ```
 
 ## OpenAPI Specification

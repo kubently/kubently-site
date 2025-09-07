@@ -44,7 +44,7 @@ Command results include:
 ```bash
 # Using curl
 curl -X POST http://your-api:8080/debug/session \
-  -H "Authorization: Bearer your-api-key" \
+  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"cluster_id": "production"}'
 ```
@@ -65,7 +65,7 @@ Response:
 ```bash
 # Get all pods
 curl -X POST http://your-api:8080/debug/execute \
-  -H "Authorization: Bearer your-api-key" \
+  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "production",
@@ -92,7 +92,7 @@ Response:
 ```bash
 # Clean up
 curl -X DELETE http://your-api:8080/debug/session/sess_abc123def456 \
-  -H "Authorization: Bearer your-api-key"
+  -H "X-API-Key: your-api-key"
 ```
 
 ## Common Commands
@@ -255,7 +255,7 @@ Kubently supports different output formats:
 ```bash
 # Get session details
 curl -X GET http://your-api:8080/debug/session/sess_abc123def456 \
-  -H "Authorization: Bearer your-api-key"
+  -H "X-API-Key: your-api-key"
 ```
 
 Response:

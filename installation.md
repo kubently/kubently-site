@@ -188,13 +188,13 @@ export API_ENDPOINT=$(kubectl get service kubently-api -n kubently -o jsonpath='
 
 # Create a debugging session
 curl -X POST http://$API_ENDPOINT:8080/debug/session \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"cluster_id": "cluster-1"}'
 
 # Execute a test command
 curl -X POST http://$API_ENDPOINT:8080/debug/execute \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "cluster-1",

@@ -93,7 +93,7 @@ export API_ENDPOINT="localhost:8080"
 ```bash
 # Create a debugging session
 curl -X POST http://$API_ENDPOINT/debug/session \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"cluster_id": "default"}' | jq
 ```
@@ -116,7 +116,7 @@ export SESSION_ID="sess_abc123def456"  # Replace with actual session ID
 
 # Execute a kubectl command
 curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "default",
@@ -142,7 +142,7 @@ Expected response:
 ### List Nodes
 ```bash
 curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "default",
@@ -155,7 +155,7 @@ curl -X POST http://$API_ENDPOINT/debug/execute \
 ### Describe a Pod
 ```bash
 curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "default",
@@ -168,7 +168,7 @@ curl -X POST http://$API_ENDPOINT/debug/execute \
 ### Get Events
 ```bash
 curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cluster_id": "default",
