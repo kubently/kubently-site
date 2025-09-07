@@ -1,5 +1,5 @@
 title: Kubently
-description: Interactive Kubernetes Debugging System - AI-powered, real-time cluster troubleshooting
+description: AI-powered system for conversational Kubernetes troubleshooting - Real-time cluster debugging through natural language
 url: "https://adickinson72.github.io"
 baseurl: "/kubently-site"
 logo: "/assets/images/kubently-logo.svg"

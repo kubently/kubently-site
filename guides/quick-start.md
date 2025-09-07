@@ -40,19 +40,19 @@ cd kubently
 kubectl apply -f deployment/kubernetes/namespace.yaml
 kubectl apply -f deployment/kubernetes/redis/
 kubectl apply -f deployment/kubernetes/api/
-kubectl apply -f deployment/kubernetes/agent/
+kubectl apply -f deployment/kubernetes/executor/
 
 # Generate and apply secrets
 export API_KEY=$(openssl rand -base64 32)
-export AGENT_TOKEN=$(openssl rand -hex 32)
+export EXECUTOR_TOKEN=$(openssl rand -hex 32)
 
 kubectl create secret generic kubently-api-config \
   --from-literal=api-keys="$API_KEY" \
-  --from-literal=agent-tokens='{"default":"'$AGENT_TOKEN'"}' \
+  --from-literal=executor-tokens='{"default":"'$EXECUTOR_TOKEN'"}' \
   -n kubently
 
-kubectl create secret generic kubently-agent-token \
-  --from-literal=token="$AGENT_TOKEN" \
+kubectl create secret generic kubently-executor-token \
+  --from-literal=token="$EXECUTOR_TOKEN" \
   -n kubently
 ```
 
@@ -64,13 +64,13 @@ kubectl get pods -n kubently
 
 # Wait for all pods to be Ready
 kubectl wait --for=condition=Ready pod -l app=kubently-api -n kubently --timeout=300s
-kubectl wait --for=condition=Ready pod -l app=kubently-agent -n kubently --timeout=300s
+kubectl wait --for=condition=Ready pod -l app=kubently-executor -n kubently --timeout=300s
 ```
 
 Expected output:
 ```
 NAME                              READY   STATUS    RESTARTS   AGE
-kubently-agent-7b8c9d4f5-xyz123   1/1     Running   0          2m
+kubently-executor-7b8c9d4f5-xyz123   1/1     Running   0          2m
 kubently-api-5f6d7e8g9-abc456     1/1     Running   0          2m
 redis-6789abc-def012              1/1     Running   0          2m
 ```
@@ -254,13 +254,13 @@ Now that you have Kubently running:
 
 ### Common Issues
 
-**Agent Not Connecting**
+**Executor Not Connecting**
 ```bash
-# Check agent logs
-kubectl logs -l app=kubently-agent -n kubently
+# Check executor logs
+kubectl logs -l app=kubently-executor -n kubently
 
 # Verify API connectivity
-kubectl exec -it deploy/kubently-agent -n kubently -- \
+kubectl exec -it deploy/kubently-executor -n kubently -- \
   curl -v http://kubently-api:8080/health
 ```
 

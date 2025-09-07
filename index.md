@@ -1,14 +1,14 @@
 ---
 layout: home
 title: Kubently
-subtitle: Interactive Kubernetes Debugging System
+subtitle: AI-Powered System for Conversational Kubernetes Troubleshooting
 ---
 
 <div class="hero">
   <div class="hero-content">
     <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 120px; margin-bottom: 1.5rem;">
     <h1 class="hero-title">Kubently</h1>
-    <p class="hero-subtitle">AI-powered, real-time Kubernetes debugging system that enables interactive troubleshooting through conversational interfaces</p>
+    <p class="hero-subtitle">AI-powered system for conversational Kubernetes troubleshooting that enables natural language debugging with real-time cluster insights</p>
     
     <div class="badges">
       <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache License">
@@ -81,8 +81,8 @@ subtitle: Interactive Kubernetes Debugging System
 <div class="features">
   <div class="feature">
     <span class="feature-icon">💬</span>
-    <h3 class="feature-title">Interactive Debugging</h3>
-    <p class="feature-description">Real-time cluster troubleshooting through conversational interfaces with context preservation</p>
+    <h3 class="feature-title">Conversational Troubleshooting</h3>
+    <p class="feature-description">Natural language debugging with AI-powered insights and context preservation</p>
   </div>
   
   <div class="feature">
