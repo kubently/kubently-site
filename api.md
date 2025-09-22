@@ -6,12 +6,16 @@ permalink: /api/
 
 # API Reference
 
-Kubently provides a comprehensive REST API for creating debug sessions, executing kubectl commands, and managing cluster interactions.
+Kubently provides a comprehensive REST API for debugging sessions, kubectl command execution, and A2A (Agent-to-Agent) protocol support for multi-agent systems.
 
-## Base URL
+## Base URLs
 
 ```
+# Main API
 http://your-kubently-api:8080
+
+# A2A Protocol (mounted on main port)
+http://your-kubently-api:8080/a2a
 ```
 
 ## Authentication
@@ -19,7 +23,7 @@ http://your-kubently-api:8080
 Kubently uses a deliberate dual-header authentication strategy:
 
 ### Client Authentication (External APIs)
-External clients (CLI, A2A services) use the `X-API-Key` header:
+External clients (CLI, A2A services, multi-agent systems) use the `X-API-Key` header:
 ```http
 X-API-Key: your-api-key-here
 ```
@@ -31,7 +35,13 @@ Authorization: Bearer executor-token-here
 X-Cluster-ID: cluster-name
 ```
 
-This separation allows future OIDC/JWT implementation for human users without conflicting with machine-to-machine authentication.
+### OAuth/OIDC Support
+Kubently supports OAuth 2.0 and OIDC for enterprise authentication:
+```http
+Authorization: Bearer jwt-token-here
+```
+
+This separation allows OIDC/JWT implementation for human users without conflicting with machine-to-machine authentication.
 
 ## Endpoints
 
@@ -138,7 +148,7 @@ List all active debug sessions (admin only).
 
 #### POST /debug/execute
 
-Execute a kubectl command within a debug session.
+Execute a kubectl command within a debug session. Commands are validated against configurable security modes.
 
 **Request Body**
 ```json
@@ -314,7 +324,35 @@ X-RateLimit-Remaining: 95
 X-RateLimit-Reset: 1642681860
 ```
 
-## A2A (Agent-to-Agent) Headers
+## A2A (Agent-to-Agent) Protocol
+
+### Overview
+
+Kubently includes full A2A protocol support for multi-agent systems, enabling natural language interactions with Kubernetes clusters through LLM providers integrated in the cnoe_agent_utils LLMFactory (including Google, Anthropic, OpenAI, and others).
+
+### A2A Endpoints
+
+#### POST /a2a/sessions
+
+Create a new A2A session for natural language debugging.
+
+**Request Body**
+```json
+{
+  "query": "Check if there are any pods in crashloopbackoff state",
+  "cluster_id": "kind",  // Optional, defaults to configured cluster
+  "thread_id": "thread-123"  // Optional, for conversation continuity
+}
+```
+
+**Response** (Server-Sent Events stream)
+```
+data: {"type": "tool_call", "tool": "execute_kubectl", "parameters": {"command": "get pods -A"}}
+data: {"type": "content", "content": "I found 2 pods in CrashLoopBackOff state..."}
+data: {"type": "done"}
+```
+
+### A2A Headers
 
 For multi-agent systems, include these additional headers:
 
@@ -323,6 +361,28 @@ X-Correlation-ID: unique-trace-id
 X-Service-Identity: calling-service-name
 X-Request-Timeout: 30
 ```
+
+### Tool Call Visibility
+
+The A2A protocol exposes actual tool calls made by the agent, enabling:
+- Full observability of kubectl commands executed
+- Performance monitoring and optimization
+- Audit logging and compliance tracking
+- Test automation and validation
+
+Example tool call event:
+```json
+{
+  "type": "tool_call",
+  "tool": "execute_kubectl",
+  "parameters": {
+    "cluster_id": "production",
+    "command": "describe",
+    "resource": "pod/failing-app",
+    "namespace": "default"
+  },
+  "timestamp": "2024-01-20T10:30:45Z"
+}
 
 ## WebSocket API (Future)
 

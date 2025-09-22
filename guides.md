@@ -14,7 +14,7 @@ Comprehensive guides to help you get the most out of Kubently.
   <div class="feature">
     <span class="feature-icon">🚀</span>
     <h3 class="feature-title"><a href="/guides/quick-start/">Quick Start</a></h3>
-    <p class="feature-description">Get Kubently running in your cluster in under 5 minutes</p>
+    <p class="feature-description">Deploy Kubently with Helm and start debugging in under 5 minutes</p>
   </div>
   
   <div class="feature">
@@ -41,8 +41,8 @@ Comprehensive guides to help you get the most out of Kubently.
   
   <div class="feature">
     <span class="feature-icon">🔌</span>
-    <h3 class="feature-title"><a href="/guides/a2a-integration/">A2A Integration</a></h3>
-    <p class="feature-description">Agent-to-Agent communication and orchestration</p>
+    <h3 class="feature-title"><a href="/guides/a2a-integration/">A2A Protocol</a></h3>
+    <p class="feature-description">Full A2A protocol implementation with tool call streaming</p>
   </div>
   
   <div class="feature">
@@ -58,13 +58,13 @@ Comprehensive guides to help you get the most out of Kubently.
   <div class="feature">
     <span class="feature-icon">☸️</span>
     <h3 class="feature-title"><a href="/guides/helm-deployment/">Helm Deployment</a></h3>
-    <p class="feature-description">Deploy Kubently using Helm charts with custom values</p>
+    <p class="feature-description">Production deployment with TLS, RBAC customization, and security modes</p>
   </div>
   
   <div class="feature">
     <span class="feature-icon">🌍</span>
     <h3 class="feature-title"><a href="/guides/multi-cluster/">Multi-Cluster Setup</a></h3>
-    <p class="feature-description">Monitor multiple Kubernetes clusters from a single API</p>
+    <p class="feature-description">Deploy executors across clusters with per-cluster security configuration</p>
   </div>
   
   <div class="feature">
@@ -78,9 +78,21 @@ Comprehensive guides to help you get the most out of Kubently.
 
 <div class="features">
   <div class="feature">
+    <span class="feature-icon">💻</span>
+    <h3 class="feature-title"><a href="/guides/cli-usage/">CLI Usage</a></h3>
+    <p class="feature-description">Use the Node.js CLI for interactive debugging sessions</p>
+  </div>
+
+  <div class="feature">
+    <span class="feature-icon">🧪</span>
+    <h3 class="feature-title"><a href="/guides/test-automation/">Test Automation</a></h3>
+    <p class="feature-description">Comprehensive test framework with AI-powered analysis</p>
+  </div>
+
+  <div class="feature">
     <span class="feature-icon">🔗</span>
     <h3 class="feature-title"><a href="/guides/api-integration/">API Integration</a></h3>
-    <p class="feature-description">Integrate Kubently with external tools and services</p>
+    <p class="feature-description">REST API and A2A protocol integration patterns</p>
   </div>
   
   <div class="feature">

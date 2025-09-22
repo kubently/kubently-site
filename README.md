@@ -4,7 +4,7 @@
 [![Jekyll](https://img.shields.io/badge/Jekyll-4.3-red)](https://jekyllrb.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Modern documentation website for Kubently - the AI-powered system for conversational Kubernetes troubleshooting.
+Modern documentation website for Kubently - the AI-powered system for conversational Kubernetes troubleshooting. Kubently supports multiple LLM providers through the LLMFactory interface, enabling flexible integration with any supported AI model.
 
 ## 🌟 Live Site
 

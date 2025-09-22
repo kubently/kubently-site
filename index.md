@@ -40,7 +40,7 @@ subtitle: AI-Powered System for Conversational Kubernetes Troubleshooting
     <div class="feature">
       <span class="feature-icon">🤖</span>
       <h3 class="feature-title">AI-Native Design</h3>
-      <p class="feature-description">Built for LLM and multi-agent systems with native A2A communication</p>
+      <p class="feature-description">Multi-LLM support with native A2A (Agent-to-Agent) protocol for any LLM provider</p>
     </div>
     
     <div class="feature">
@@ -57,8 +57,8 @@ subtitle: AI-Powered System for Conversational Kubernetes Troubleshooting
     
     <div class="feature">
       <span class="feature-icon">🔌</span>
-      <h3 class="feature-title">API Integration</h3>
-      <p class="feature-description">Native REST API for AI tools and external services</p>
+      <h3 class="feature-title">Flexible Integration</h3>
+      <p class="feature-description">REST API, Node.js CLI, and comprehensive test automation framework</p>
     </div>
   </div>
 </div>
@@ -71,30 +71,31 @@ subtitle: AI-Powered System for Conversational Kubernetes Troubleshooting
 
 ### Core Components
 
-1. **Kubently API**: Horizontally scalable FastAPI service managing sessions and command orchestration
-2. **Kubently Executor**: SSE-connected component deployed in each target cluster  
-3. **Redis**: Pub/Sub for command distribution and state storage
-4. **SSE Connection**: Real-time streaming for instant command delivery (no polling)
+1. **Kubently API**: Horizontally scalable FastAPI service with A2A server for multi-agent communication
+2. **Kubently Executor**: Lightweight agent deployed in each target cluster with configurable RBAC rules
+3. **Redis**: Pub/Sub for command distribution, session persistence, and conversation state
+4. **SSE Connection**: Real-time bidirectional streaming for instant command delivery (~50ms latency)
+5. **LLM Integration**: Supports multiple LLM providers through LLMFactory for intelligent troubleshooting
 
 ## Use Cases
 
 <div class="features">
   <div class="feature">
     <span class="feature-icon">💬</span>
-    <h3 class="feature-title">Conversational Troubleshooting</h3>
-    <p class="feature-description">Natural language debugging with AI-powered insights and context preservation</p>
+    <h3 class="feature-title">Intelligent Troubleshooting</h3>
+    <p class="feature-description">Systematic debugging with LLM-powered analysis and todo tracking for thorough investigations</p>
   </div>
   
   <div class="feature">
     <span class="feature-icon">🤖</span>
     <h3 class="feature-title">Multi-Agent Systems</h3>
-    <p class="feature-description">Integration with LLM-powered agents via native A2A communication protocol</p>
+    <p class="feature-description">Full A2A protocol implementation with tool call interception and streaming responses</p>
   </div>
   
   <div class="feature">
     <span class="feature-icon">🏢</span>
-    <h3 class="feature-title">Production Operations</h3>
-    <p class="feature-description">Safe read-only cluster inspection with automated diagnostic workflows</p>
+    <h3 class="feature-title">Enterprise Ready</h3>
+    <p class="feature-description">OAuth/OIDC authentication, TLS support with cert-manager, and comprehensive test automation</p>
   </div>
 </div>
 

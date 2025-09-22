@@ -14,45 +14,72 @@ This guide covers installing Kubently in various environments, from local develo
 
 ## Prerequisites
 
-- Kubernetes cluster (1.24+)
+- Kubernetes cluster (1.24+) or Kind for local testing
 - kubectl configured
-- Helm 3.x installed (recommended)
-- Docker for building images (optional)
+- Helm 3.x installed (required for Helm deployment)
+- At least one LLM API key (Google, Anthropic, OpenAI, or any LLMFactory-supported provider)
 
 ## Installation Methods
 
 ### Method 1: Helm Chart (Recommended)
 
-#### Quick Install
+<div class="alert alert-warning">
+⚠️ <strong>Security Note:</strong> While TLS is sufficient for securing connections, we strongly recommend keeping the ingress restricted to non-public IP addresses until the authentication/authorization system is more mature.
+</div>
+
+#### Quick Install with Test Script
 
 ```bash
-# Add Redis dependency
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+# Set your LLM API key (at least one required)
+# Supports any LLMFactory-compatible provider:
+export GOOGLE_API_KEY=your-api-key      # For Google LLMs
+# OR
+export ANTHROPIC_API_KEY=your-api-key   # For Claude
+# OR
+export OPENAI_API_KEY=your-api-key      # For GPT models
 
+# Deploy using the test script (includes TLS setup)
+./deploy-test.sh
+
+# Test the deployment
+./test-a2a.sh
+```
+
+#### Manual Helm Install
+
+```bash
 # Create namespace
 kubectl create namespace kubently
 
-# Deploy Kubently with default settings
+# Create LLM API key secret
+kubectl create secret generic llm-api-keys \
+  --from-literal=google-key=$GOOGLE_API_KEY \
+  --namespace kubently
+
+# Deploy Kubently with test values
 helm install kubently ./deployment/helm/kubently \
   --namespace kubently \
-  --set api.image.tag=sse \
-  --set executor.image.tag=sse
+  --values deployment/helm/test-values.yaml
 ```
 
 #### Production Install
 
 ```bash
-# Generate secure API key
+# Set LLM API keys (choose your provider)
+export GOOGLE_API_KEY=your-api-key  # Or use ANTHROPIC_API_KEY/OPENAI_API_KEY
 export API_KEY=$(openssl rand -hex 32)
 
-# Create values file
+# Create production values file
 cat > values-prod.yaml <<EOF
+# TLS Configuration (strongly recommended)
+tls:
+  enabled: true
+  mode: "internal"  # Use "external" for public certificates
+
 api:
   replicaCount: 3  # Horizontal scaling
-  image:
-    repository: kubently/api
-    tag: sse
+  apiKeys:
+    - "$API_KEY"  # Add multiple keys as needed
   resources:
     requests:
       cpu: 250m
@@ -62,12 +89,17 @@ api:
       memory: 768Mi
 
 executor:
-  image:
-    repository: kubently/executor
-    tag: sse
-  env:
-    EXECUTOR_TYPE: sse  # Use SSE for instant delivery
-    LOG_LEVEL: INFO
+  enabled: true
+  replicaCount: 1
+  # Configure RBAC security mode
+  rbacRules: []  # Will use default read-only rules
+
+kubentlyExecutor:
+  securityMode: "readOnly"  # Options: readOnly, extendedReadOnly, fullAccess
+  commandWhitelist:
+    enabled: true
+    maxArguments: 20
+    timeoutSeconds: 30
 
 redis:
   enabled: true
@@ -75,7 +107,18 @@ redis:
     persistence:
       enabled: true
       size: 8Gi
+
+ingress:
+  enabled: false  # Keep disabled for internal access only
+  # If you must enable, restrict to private IPs:
+  # annotations:
+  #   nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12"
 EOF
+
+# Create LLM secret
+kubectl create secret generic llm-api-keys \
+  --from-literal=google-key=$GOOGLE_API_KEY \
+  --namespace kubently
 
 # Deploy with production values
 helm upgrade --install kubently ./deployment/helm/kubently \
@@ -103,7 +146,24 @@ kubectl apply -f deployment/kubernetes/executor/
 kubectl get pods -n kubently
 ```
 
-### Method 3: Docker Compose (Development)
+### Method 3: Kind Cluster (Local Testing)
+
+```bash
+# Create Kind cluster with specific configuration
+kind create cluster --name kubently --config deployment/kind-config.yaml
+
+# Set context
+kubectl config use-context kind-kubently
+
+# Deploy using the test script (set one of these)
+export GOOGLE_API_KEY=your-api-key     # Or ANTHROPIC_API_KEY, OPENAI_API_KEY
+./deploy-test.sh
+
+# Port-forward for local access
+kubectl port-forward -n kubently svc/kubently-api 8080:8080
+```
+
+### Method 4: Docker Compose (Development)
 
 ```bash
 # Clone and navigate to the project
@@ -117,15 +177,6 @@ docker-compose -f deployment/docker-compose.yaml up -d
 docker-compose ps
 ```
 
-### Method 4: Kind Cluster (Local Testing)
-
-```bash
-# Create Kind cluster
-kind create cluster --config deployment/kind-config.yaml
-
-# Deploy using the convenience script
-./deployment/scripts/kind-deploy.sh
-```
 
 ## Configuration
 
@@ -135,20 +186,33 @@ kind create cluster --config deployment/kind-config.yaml
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `KUBENTLY_REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
-| `KUBENTLY_API_PORT` | API service port | `8080` |
-| `KUBENTLY_API_KEYS` | Comma-separated API keys | Required |
-| `KUBENTLY_EXECUTOR_TOKENS` | JSON map of cluster to tokens | Required |
+| `REDIS_URL` | Redis connection URL | `redis://redis:6379` |
+| `PORT` | API service port | `8080` |
+| `API_PORT` | API port (same as PORT) | `8080` |
+| `A2A_ENABLED` | Enable A2A protocol | `true` |
+| `LOG_LEVEL` | Logging level | `INFO` |
+| `SESSION_TTL` | Session time-to-live | `300` |
+| `MAX_COMMANDS_PER_FETCH` | Commands per fetch | `10` |
+| `COMMAND_TIMEOUT` | Command timeout (seconds) | `30` |
 
 #### Executor Configuration
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `KUBENTLY_API_URL` | Central API URL | Required |
-| `CLUSTER_ID` | Unique cluster identifier | Required |
-| `KUBENTLY_TOKEN` | Authentication token | Required |
-| `POLL_INTERVAL` | Normal polling interval (seconds) | `10` |
-| `FAST_POLL_INTERVAL` | Active session polling (seconds) | `0.5` |
+| `CLUSTER_ID` | Unique cluster identifier | Namespace name |
+| `KUBENTLY_TOKEN` | Authentication token | Auto-generated |
+| `LOG_LEVEL` | Logging level | `INFO` |
+
+#### LLM Configuration (Required - at least one)
+
+| Variable | Description | Provider |
+|----------|-------------|----------|
+| `GOOGLE_API_KEY` | Google API key | Google LLM models |
+| `ANTHROPIC_API_KEY` | Anthropic API key | Claude models |
+| `OPENAI_API_KEY` | OpenAI API key | GPT models |
+
+Kubently uses the cnoe_agent_utils LLMFactory to support multiple LLM providers. You only need to configure one provider, and the system will automatically use the available LLM. The LLMFactory currently integrates Google, Anthropic, and OpenAI providers, with support for additional providers as they are added to cnoe_agent_utils.
 
 ### Creating Secrets
 
@@ -182,26 +246,39 @@ kubectl create secret generic kubently-executor-token \
 
 ### Test the Installation
 
+#### Using the CLI
+
 ```bash
-# Get the API endpoint
-export API_ENDPOINT=$(kubectl get service kubently-api -n kubently -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# Install the Node.js CLI
+cd kubently-cli/nodejs
+npm install && npm run build && npm link
 
-# Create a debugging session
-curl -X POST http://$API_ENDPOINT:8080/debug/session \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"cluster_id": "cluster-1"}'
+# Test with the CLI
+kubently --api-url http://localhost:8080 --api-key test-api-key debug
+```
 
-# Execute a test command
-curl -X POST http://$API_ENDPOINT:8080/debug/execute \
-  -H "X-API-Key: $API_KEY" \
+#### Using the Test Automation
+
+```bash
+# Run comprehensive test suite
+cd test-automation
+./run_tests.sh --api-key test-api-key
+
+# Run specific scenario
+./run_tests.sh test-and-analyze --api-key test-api-key --scenario 14-service-port-mismatch
+```
+
+#### Using Direct API Calls
+
+```bash
+# Port-forward if needed
+kubectl port-forward -n kubently svc/kubently-api 8080:8080 &
+
+# Test A2A endpoint
+curl -X POST http://localhost:8080/a2a/sessions \
+  -H "X-API-Key: test-api-key" \
   -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "cluster-1",
-    "session_id": "session-id-from-above",
-    "command_type": "get",
-    "args": ["pods", "-A", "--limit=5"]
-  }'
+  -d '{"query": "check if there are any pods in crashloopbackoff"}'
 ```
 
 ### Health Checks
@@ -252,11 +329,17 @@ kubectl exec -it deploy/kubently-api -n kubently -- \
 
 ## Security Considerations
 
-1. **API Keys**: Use strong, unique API keys for each client
-2. **Executor Tokens**: Generate unique tokens for each cluster
-3. **Network Security**: Consider network policies to restrict traffic
-4. **RBAC**: Review and customize the executor's Kubernetes permissions
-5. **TLS**: Enable TLS/SSL for production deployments
+<div class="alert alert-warning">
+⚠️ <strong>Important:</strong> While TLS provides secure communication, we strongly recommend keeping the ingress restricted to non-public IP addresses until the authentication/authorization system is more mature.
+</div>
+
+1. **API Keys**: Use strong, unique API keys for each client (X-API-Key header)
+2. **Executor Tokens**: Automatically generated or manually configured per cluster
+3. **Network Security**: Keep ingress on private IPs only for now
+4. **RBAC**: Fully configurable via Helm values - defaults to read-only
+5. **TLS**: Enabled by default with cert-manager integration
+6. **OAuth/OIDC**: Supported for enterprise authentication
+7. **Command Whitelisting**: Dynamic security modes (readOnly, extendedReadOnly, fullAccess)
 
 ## Next Steps
 

@@ -6,7 +6,7 @@ permalink: /architecture/
 
 # Architecture
 
-Kubently follows a modular, black-box architecture where each component exposes only its public interface while hiding implementation details. This design enables independent development, testing, and replacement of components without affecting the overall system.
+Kubently follows a modular, black-box architecture where each component exposes only its public interface while hiding implementation details. This design enables independent development, testing, and replacement of components without affecting the overall system. The system is LLM-agnostic, supporting multiple providers through the cnoe_agent_utils LLMFactory interface (currently including Google, Anthropic, and OpenAI).
 
 ## System Overview
 
@@ -62,7 +62,9 @@ The API service orchestrates debugging sessions and command execution across mul
 **Key Features:**
 - **Horizontal Scaling**: Multiple pods with Redis pub/sub distribution
 - **SSE Endpoint**: Real-time executor streaming via Server-Sent Events
-- **A2A Support**: Built-in A2A server on port 8000 for multi-agent systems
+- **A2A Support**: Full A2A protocol implementation with tool call interception
+- **LLM Integration**: Multiple LLM providers supported through LLMFactory
+- **Todo Management**: Built-in todo tool for systematic troubleshooting
 - **Stateless Design**: All state in Redis for perfect scaling
 
 **Endpoints:**
@@ -71,11 +73,13 @@ The API service orchestrates debugging sessions and command execution across mul
 - `POST /debug/session` - Create debugging session
 - `POST /executor/results` - Receive command results
 - `GET /health` - Health check
+- `/a2a/*` - A2A protocol endpoints (mounted on main port)
 
 **Performance:**
 - ~50ms command delivery via SSE
 - Supports 1000+ commands/sec
 - Unlimited API pod replicas
+- Real-time streaming with tool call visibility
 
 ### Kubently Executor (Per-Cluster)
 
@@ -87,10 +91,15 @@ SSE-connected component deployed in each target cluster for instant command exec
 - **Auto-reconnection**: Resilient connection handling
 - **Token Authentication**: Secure cluster identification
 
-**Security Modes:**
+**Security Modes (Configurable via Helm):**
 - `readOnly`: Safe read operations only (default)
 - `extendedReadOnly`: Includes auth/certificate operations
 - `fullAccess`: All operations (requires explicit acknowledgment)
+
+**RBAC Configuration:**
+- Fully customizable RBAC rules via Helm values
+- Per-cluster security overrides supported
+- Dynamic whitelist with runtime reloading
 
 **Performance:**
 - Instant command delivery via SSE
@@ -183,13 +192,15 @@ sequenceDiagram
 ### Authentication Layers
 
 1. **API Authentication**
-   - Bearer token authentication
+   - Bearer token authentication (X-API-Key header)
+   - OAuth 2.0/OIDC support
    - API key validation
    - Rate limiting per key
 
-2. **Agent Authentication**
-   - Unique tokens per cluster
-   - Mutual TLS (optional)
+2. **Executor Authentication**
+   - Unique tokens per cluster (Authorization: Bearer header)
+   - TLS support with cert-manager integration
+   - Automatic token generation if not provided
    - Token rotation support
 
 3. **Kubernetes RBAC**
