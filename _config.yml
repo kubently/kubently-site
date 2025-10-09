@@ -1,7 +1,7 @@
 title: Kubently
-description: AI-powered system for conversational Kubernetes troubleshooting - Real-time cluster debugging through natural language
-url: "https://adickinson72.github.io"
-baseurl: "/kubently-site"
+description: Troubleshoot Kubernetes agentically with AI-powered conversational debugging - Real-time cluster insights through natural language
+url: "https://kubently.io"
+baseurl: ""
 logo: "/assets/images/kubently-logo.svg"
 
 markdown: kramdown
@@ -19,7 +19,7 @@ author: Kubently Team
 email: hello@kubently.io
 
 # Social links
-github_username: adickinson
+github_username: kubently
 twitter_username: kubently
 
 # Site colors (referenced in CSS)
