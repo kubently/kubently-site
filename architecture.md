@@ -138,29 +138,30 @@ executor-results:{command_id}   # Command results
 
 ## Data Flow
 
-### Command Execution Flow
+### Command Execution Flow (SSE-based)
 
 ```mermaid
 sequenceDiagram
     participant Client as Client/Agent
     participant API as Kubently API
-    participant Redis as Redis
-    participant Agent as Cluster Agent
+    participant Redis as Redis Pub/Sub
+    participant Executor as Kubently Executor
     participant K8s as Kubernetes
 
+    Note over Executor,API: Executor maintains persistent SSE connection
+    Executor->>API: GET /executor/stream (SSE)
+    API-->>Executor: SSE connection established
+
     Client->>API: POST /debug/execute
-    API->>Redis: Queue command
+    API->>Redis: Publish command
+    Redis-->>Executor: Real-time delivery (~50ms)
     API-->>Client: Command queued (202)
-    
-    loop Polling
-        Agent->>Redis: Poll for commands
-        Redis-->>Agent: Return queued command
-    end
-    
-    Agent->>K8s: Execute kubectl command
-    K8s-->>Agent: Return results
-    Agent->>Redis: Store results
-    
+
+    Executor->>K8s: Execute kubectl command
+    K8s-->>Executor: Return results
+    Executor->>API: POST /executor/results
+    API->>Redis: Store results
+
     Client->>API: GET /debug/result/{id}
     API->>Redis: Fetch result
     Redis-->>API: Return result

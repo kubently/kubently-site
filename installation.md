@@ -130,7 +130,7 @@ helm upgrade --install kubently ./deployment/helm/kubently \
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/kubently.git
+git clone https://github.com/kubently/kubently.git
 cd kubently
 
 # Deploy Redis
@@ -167,7 +167,7 @@ kubectl port-forward -n kubently svc/kubently-api 8080:8080
 
 ```bash
 # Clone and navigate to the project
-git clone https://github.com/your-org/kubently.git
+git clone https://github.com/kubently/kubently.git
 cd kubently
 
 # Start with Docker Compose
@@ -343,7 +343,7 @@ kubectl exec -it deploy/kubently-api -n kubently -- \
 
 ## Next Steps
 
-- [Quick Start Guide](guides/quick-start.md) - Learn basic usage
-- [API Reference](api.md) - Explore the full API
-- [Architecture](architecture.md) - Understand the system design
-- [Security Guide](guides/security.md) - Security best practices
+- [Quick Start Guide](/guides/quick-start/) - Learn basic usage
+- [API Reference](/api/) - Explore the full API
+- [Architecture](/architecture/) - Understand the system design
+- [Security Guide](/guides/security/) - Security best practices

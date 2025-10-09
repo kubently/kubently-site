@@ -22,7 +22,7 @@ Before you begin, ensure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/kubently.git
+git clone https://github.com/kubently/kubently.git
 cd kubently
 
 # Create a Kind cluster with Kubently
@@ -33,7 +33,7 @@ cd kubently
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/kubently.git
+git clone https://github.com/kubently/kubently.git
 cd kubently
 
 # Deploy to your cluster
@@ -245,10 +245,10 @@ kubently exec get pv,pvc -A
 
 Now that you have Kubently running:
 
-1. **Explore the [API Reference](../api.md)** - Learn about all available endpoints
-2. **Read the [Security Guide](security.md)** - Understand security best practices
-3. **Try [Multi-Agent Integration](multi-agent.md)** - Connect with AI systems
-4. **Set up [Monitoring](monitoring.md)** - Monitor your Kubently deployment
+1. **Explore the [API Reference](/api/)** - Learn about all available endpoints
+2. **Read the [Security Guide](/guides/security/)** - Understand security best practices
+3. **Try [Multi-Agent Integration](/guides/multi-agent/)** - Connect with AI systems
+4. **Review [Troubleshooting](/guides/troubleshooting/)** - Common issues and solutions
 
 ## Troubleshooting
 
@@ -282,4 +282,4 @@ curl http://$API_ENDPOINT/health
 kubectl logs -l app=kubently-api -n kubently | grep -i redis
 ```
 
-For more troubleshooting help, see the [Troubleshooting Guide](troubleshooting.md).
+For more troubleshooting help, see the [Troubleshooting Guide](/guides/troubleshooting/).

@@ -236,3 +236,49 @@ You have access to these Kubently tools:
 
 ```markdown
 Human: The pods in my production cluster are crashing. Can you help debug this?
+
+Assistant: I'll help debug your production cluster. Let me start by creating a session and checking for problematic pods.
+
+[Tool: create_debug_session]
+cluster_id: production
+
+[Result: Session created successfully - sess_abc123]
+
+[Tool: execute_kubectl]
+session_id: sess_abc123
+command: get pods -A --field-selector=status.phase\!=Running
+
+[Result: Found 3 pods in CrashLoopBackOff state]
+- default/app-backend-7f8d9c-xyz (CrashLoopBackOff, 15 restarts)
+- default/app-worker-6b5c8d-abc (CrashLoopBackOff, 12 restarts)
+- monitoring/prometheus-9d4e2f-def (ImagePullBackOff)
+
+[Tool: execute_kubectl]
+session_id: sess_abc123
+command: describe pod app-backend-7f8d9c-xyz -n default
+
+[Analysis]
+I've identified the issues:
+
+1. **app-backend and app-worker** - Both crashing due to database connection failure
+   - Error: "Connection refused to postgres:5432"
+   - Root cause: PostgreSQL service is not accessible
+   - Recommendation: Check if postgres service and pods are running
+
+2. **prometheus** - Image pull failure
+   - Error: "Failed to pull image prometheus:v2.50.0"
+   - Root cause: Image tag doesn't exist in registry
+   - Recommendation: Verify image tag or use latest stable version
+
+[Tool: close_session]
+session_id: sess_abc123
+
+Would you like me to investigate the PostgreSQL connectivity issue further?
+```
+
+## Next Steps
+
+- [A2A Integration Guide](/guides/a2a-integration/)
+- [Basic Usage](/guides/basic-usage/)
+- [API Reference](/api/)
+- [Security Guide](/guides/security/)

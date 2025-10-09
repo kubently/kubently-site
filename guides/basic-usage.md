@@ -405,7 +405,7 @@ Results are cached briefly to improve performance:
 
 ## Next Steps
 
-- [Multi-Agent Integration](multi-agent.md) - Connect with AI systems
-- [Security Guide](security.md) - Production security practices  
-- [API Reference](../api.md) - Complete API documentation
-- [Troubleshooting](troubleshooting.md) - Common issues and solutions
+- [Multi-Agent Integration](/guides/multi-agent/) - Connect with AI systems
+- [Security Guide](/guides/security/) - Production security practices
+- [API Reference](/api/) - Complete API documentation
+- [Troubleshooting](/guides/troubleshooting/) - Common issues and solutions

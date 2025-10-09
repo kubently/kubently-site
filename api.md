@@ -11,12 +11,14 @@ Kubently provides a comprehensive REST API for debugging sessions, kubectl comma
 ## Base URLs
 
 ```
-# Main API
+# Main API (includes A2A endpoints)
 http://your-kubently-api:8080
 
-# A2A Protocol (mounted on main port)
+# A2A Protocol Endpoints (mounted on main API port)
 http://your-kubently-api:8080/a2a
 ```
+
+**Note**: The A2A protocol endpoints are mounted on the main API service port (8080) under the `/a2a` path. This allows a single ingress/load balancer to handle both standard API calls and A2A protocol communications.
 
 ## Authentication
 
@@ -383,6 +385,7 @@ Example tool call event:
   },
   "timestamp": "2024-01-20T10:30:45Z"
 }
+```
 
 ## WebSocket API (Future)
 

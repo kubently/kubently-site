@@ -1,14 +1,14 @@
 ---
 layout: home
 title: Kubently
-subtitle: AI-Powered System for Conversational Kubernetes Troubleshooting
+subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugging
 ---
 
 <div class="hero">
   <div class="hero-content">
     <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 120px; margin-bottom: 1.5rem;">
     <h1 class="hero-title">Kubently</h1>
-    <p class="hero-subtitle">AI-powered system for conversational Kubernetes troubleshooting that enables natural language debugging with real-time cluster insights</p>
+    <p class="hero-subtitle">Troubleshoot Kubernetes agentically with AI-powered conversational debugging that enables natural language interactions and real-time cluster insights</p>
     
     <div class="badges">
       <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache License">
@@ -106,7 +106,7 @@ Ready to start debugging your Kubernetes clusters with AI-powered insights?
 <div class="hero-buttons" style="margin-top: 2rem;">
   <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">🚀 Quick Start Guide</a>
   <a href="{{ '/installation/' | relative_url }}" class="btn btn-secondary">📦 Installation</a>
-  <a href="https://github.com/your-org/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
+  <a href="https://github.com/kubently/kubently" class="btn btn-secondary">⭐ View on GitHub</a>
 </div>
 
 ## Community & Support  
@@ -124,5 +124,5 @@ Join the Kubently community and get help from other users and maintainers:
 ---
 
 <div style="text-align: center; padding: 2rem 0; color: var(--medium-gray);">
-  <strong>Kubently</strong> - Making Kubernetes debugging conversational 🚀
+  <strong>Kubently</strong> - Kubernetes troubleshooting, agentically 🚀
 </div>

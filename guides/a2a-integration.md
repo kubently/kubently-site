@@ -26,33 +26,40 @@ The A2A integration allows multiple AI agents to:
               │ A2A Protocol
               ▼
 ┌─────────────────────────────────────────────────┐
-│           Kubently A2A Server (Port 8000)       │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
-│  │  Agent   │  │  Agent   │  │  Agent   │     │
-│  │ Registry │  │  Router  │  │  Handler │     │
-│  └──────────┘  └──────────┘  └──────────┘     │
+│         Kubently API (Port 8080)                │
+│  ┌──────────────────────────────────────────┐  │
+│  │     Main API Endpoints                    │  │
+│  └──────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────┐  │
+│  │     A2A Protocol Endpoints (/a2a/*)      │  │
+│  │  ┌──────────┐  ┌──────────┐             │  │
+│  │  │  Session │  │  Tool    │             │  │
+│  │  │  Handler │  │  Handler │             │  │
+│  │  └──────────┘  └──────────┘             │  │
+│  └──────────────────────────────────────────┘  │
 └─────────────┬───────────────────────────────────┘
-              │ Internal API
+              │ Internal Commands
               ▼
 ┌─────────────────────────────────────────────────┐
-│         Kubently Debug API (Port 8080)          │
+│         Kubently Executors (per cluster)        │
 └─────────────────────────────────────────────────┘
 ```
 
+**Note**: A2A endpoints are mounted on the main API service port (8080) under the `/a2a` path. This simplifies deployment by requiring only a single service port.
+
 ## Configuration
 
-### Enable A2A Server
+### Enable A2A Support
 
-The A2A server runs alongside the main API on port 8000:
+A2A protocol support is enabled by default and served on the main API port:
 
 ```yaml
 # values.yaml for Helm deployment
 api:
   env:
-    A2A_ENABLED: "true"
-    A2A_PORT: "8000"
+    A2A_ENABLED: "true"  # Default: true
   service:
-    a2aPort: 8000
+    port: 8080  # Single port serves both API and A2A endpoints
 ```
 
 ### Agent Registration
@@ -60,20 +67,24 @@ api:
 Agents register themselves with the A2A server:
 
 ```python
-# Example agent registration
+# Example agent session creation for A2A
 import httpx
 
-async def register_agent():
+async def create_a2a_session():
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            "http://kubently-api:8000/agents/register",
+            "http://kubently-api:8080/a2a/sessions",
+            headers={"X-API-Key": "your-api-key"},
             json={
-                "name": "kubernetes-debugger",
-                "capabilities": ["debug", "logs", "describe"],
-                "cluster_ids": ["prod-cluster", "staging-cluster"]
+                "query": "Check for pods in CrashLoopBackOff state",
+                "cluster_id": "prod-cluster"
             }
         )
-        return response.json()["agent_id"]
+        # Returns streaming SSE response with tool calls and content
+        async for line in response.aiter_lines():
+            if line.startswith("data: "):
+                data = json.loads(line[6:])
+                yield data
 ```
 
 ## A2A Communication Protocol
@@ -117,7 +128,7 @@ from kubently_client import KubentlyA2AClient
 
 # Initialize A2A client
 a2a_client = KubentlyA2AClient(
-    base_url="http://kubently-api:8000",
+    base_url="http://kubently-api:8080",
     agent_id="langchain-agent"
 )
 
@@ -147,7 +158,7 @@ class KubernetesDebugAgent(AssistantAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.kubently = KubentlyA2AClient(
-            base_url="http://kubently-api:8000"
+            base_url="http://kubently-api:8080"
         )
     
     async def debug_cluster(self, cluster_id, query):
@@ -170,7 +181,7 @@ async def kubently_debug_tool(cluster_id: str, command: str):
     """Debug Kubernetes clusters via Kubently API"""
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            "http://kubently-api:8000/debug/execute",
+            "http://kubently-api:8080/debug/execute",
             json={
                 "cluster_id": cluster_id,
                 "command": command
@@ -308,21 +319,19 @@ async def debug_application_issue(namespace, app_name):
 View A2A metrics and traces:
 
 ```bash
-# Check A2A server health
-curl http://kubently-api:8000/health
+# Check A2A health (via main API)
+curl http://kubently-api:8080/health
 
-# View agent registry
-curl http://kubently-api:8000/agents
-
-# Monitor active conversations
-curl http://kubently-api:8000/conversations
+# Check A2A sessions
+curl http://kubently-api:8080/a2a/sessions \
+  -H "X-API-Key: your-api-key"
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Connection Refused**: Ensure A2A server is enabled and port 8000 is accessible
+1. **Connection Refused**: Ensure A2A endpoints are enabled and port 8080 is accessible
 2. **Authentication Failed**: Verify agent tokens are correctly configured
 3. **Timeout Errors**: Check network connectivity between agents and Kubently
 4. **Rate Limit Exceeded**: Implement exponential backoff in agent code
@@ -343,4 +352,4 @@ api:
 - [Multi-Agent Systems Guide](/guides/multi-agent/)
 - [API Reference](/api/)
 - [Security Best Practices](/guides/security/)
-- [API Integration Guide](/guides/api-integration/)
+- [Basic Usage Guide](/guides/basic-usage/)
