@@ -6,14 +6,13 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
 
 <div class="hero">
   <div class="hero-content">
-    <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 120px; margin-bottom: 1.5rem;">
-    <h1 class="hero-title">Kubently</h1>
+    <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 180px; margin-bottom: 1.5rem;">
     <p class="hero-subtitle">Troubleshoot Kubernetes agentically with AI-powered conversational debugging that enables natural language interactions and real-time cluster insights</p>
     
     <div class="badges">
       <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache License">
       <img src="https://img.shields.io/badge/python-3.13+-blue.svg" alt="Python 3.13+">
-      <img src="https://img.shields.io/badge/kubernetes-1.24+-326ce5.svg" alt="Kubernetes 1.24+">
+      <img src="https://img.shields.io/badge/kubernetes-1.28+-326ce5.svg" alt="Kubernetes 1.28+">
     </div>
     
     <div class="hero-buttons">
