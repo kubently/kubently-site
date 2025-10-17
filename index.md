@@ -17,7 +17,6 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
     
     <div class="hero-buttons">
       <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">Get Started</a>
-      <a href="{{ '/installation/' | relative_url }}" class="btn btn-secondary">View Installation</a>
     </div>
   </div>
 </div>
