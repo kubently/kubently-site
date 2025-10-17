@@ -4,8 +4,6 @@ title: Troubleshooting Guide
 permalink: /guides/troubleshooting/
 ---
 
-# Troubleshooting Guide
-
 This guide helps you diagnose and resolve common issues with Kubently deployments.
 
 ## Common Issues

@@ -4,8 +4,6 @@ title: Architecture
 permalink: /architecture/
 ---
 
-# Architecture
-
 Kubently follows a modular, black-box architecture where each component exposes only its public interface while hiding implementation details. This design enables independent development, testing, and replacement of components without affecting the overall system. The system is LLM-agnostic, supporting multiple providers through the cnoe_agent_utils LLMFactory interface (currently including Google, Anthropic, and OpenAI).
 
 ## System Overview
@@ -399,16 +397,6 @@ data:
 - Performance bottleneck identification
 
 ## Future Architecture Enhancements
-
-### WebSocket Support
-- Real-time command streaming
-- Bidirectional communication
-- Reduced polling overhead
-
-### Multi-Region Deployment
-- API service in multiple regions
-- Cross-region session replication
-- Disaster recovery capabilities
 
 ### Advanced Caching
 - Command result caching

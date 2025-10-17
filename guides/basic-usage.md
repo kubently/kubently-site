@@ -4,408 +4,316 @@ title: Basic Usage
 permalink: /guides/basic-usage/
 ---
 
-# Basic Usage Guide
-
 This guide covers the fundamental concepts and everyday usage patterns for Kubently.
 
 ## Core Concepts
 
-### Sessions
+### Interactive Debugging
 
-A **debug session** is a temporary context for executing kubectl commands against a specific cluster. Sessions provide:
+Kubently uses an **AI-powered conversational interface** for Kubernetes debugging. Instead of memorizing kubectl commands, you describe what you're looking for in natural language.
 
-- **Isolation**: Each session is independent
-- **Security**: Commands are scoped to the session
-- **Efficiency**: Connection reuse and caching
-- **Cleanup**: Automatic resource cleanup
+The Kubently agent:
+- **Understands** your questions in plain English
+- **Plans** systematic investigations
+- **Executes** kubectl commands automatically
+- **Analyzes** results and provides insights
+- **Tracks** investigation progress with todos
 
-### Commands
+### Supported Operations
 
-Kubently supports a subset of kubectl commands focused on **read-only operations**:
+Kubently focuses on **read-only** debugging operations:
 
 - `get` - Retrieve resources
-- `describe` - Detailed resource information  
+- `describe` - Detailed resource information
+- `logs` - Container logs
+- `top` - Resource usage
 - `explain` - Resource documentation
-- `version` - Cluster version information
+- `version` - Cluster version
 - `cluster-info` - Cluster information
 
-### Results
+Dangerous operations (delete, create, apply, patch, etc.) are automatically blocked for safety.
 
-Command results include:
-- **Output**: The actual kubectl command output
-- **Execution time**: How long the command took
-- **Status**: Success or error state
-- **Metadata**: Session and timing information
+### Sessions and Context
 
-## Basic Workflow
+The A2A agent maintains conversation context:
+- **Thread continuity**: Follows up on previous questions
+- **Investigation tracking**: Uses todo lists to ensure thoroughness
+- **Cluster memory**: Remembers which cluster you're debugging
+- **Automatic cleanup**: Context cleared when appropriate
 
-### 1. Create a Session
+## Basic Workflow (CLI)
 
-```bash
-# Using curl
-curl -X POST http://your-api:8080/debug/session \
-  -H "X-API-Key: your-api-key" \
-  -H "Content-Type: application/json" \
-  -d '{"cluster_id": "production"}'
-```
-
-Response:
-```json
-{
-  "session_id": "sess_abc123def456",
-  "cluster_id": "production", 
-  "status": "active",
-  "created_at": "2024-01-20T10:30:45Z",
-  "expires_at": "2024-01-20T11:30:45Z"
-}
-```
-
-### 2. Execute Commands
+### 1. Start Debugging
 
 ```bash
-# Get all pods
-curl -X POST http://your-api:8080/debug/execute \
-  -H "X-API-Key: your-api-key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "production",
-    "session_id": "sess_abc123def456", 
-    "command_type": "get",
-    "args": ["pods", "-A"]
-  }'
+# Start interactive session
+kubently debug
+
+# Or specify a cluster
+kubently debug production
 ```
 
-Response:
-```json
-{
-  "result_id": "res_xyz789abc123",
-  "session_id": "sess_abc123def456",
-  "status": "completed",
-  "output": "NAMESPACE     NAME                    READY   STATUS    RESTARTS   AGE\nkube-system   coredns-558bd4d5db-abc  1/1     Running   0          5m",
-  "execution_time_ms": 234,
-  "executed_at": "2024-01-20T10:32:15Z"
-}
-```
+### 2. Ask Questions
 
-### 3. Close the Session
+Use natural language to investigate your cluster:
 
 ```bash
-# Clean up
-curl -X DELETE http://your-api:8080/debug/session/sess_abc123def456 \
-  -H "X-API-Key: your-api-key"
+You> What pods are running in the kube-system namespace?
+
+Agent> Let me check that for you...
+
+[Tool: execute_kubectl]
+cluster_id: production
+command: get pods -n kube-system
+
+I found 12 pods running in kube-system:
+- coredns-5d78c9869d-abc123 (Running)
+- etcd-control-plane (Running)
+- kube-apiserver-control-plane (Running)
+... [full output]
 ```
 
-## Common Commands
+### 3. Follow Up and Investigate
+
+The agent maintains context:
+
+```bash
+You> Are any of those pods having issues?
+
+Agent> Let me check for any pods with problems...
+
+[Tool: execute_kubectl]
+cluster_id: production
+command: get pods -n kube-system --field-selector=status.phase!=Running
+
+Good news! All 12 pods in kube-system are Running. No issues detected.
+
+You> What about other namespaces?
+
+Agent> I'll check all namespaces for problematic pods...
+
+[Tool: execute_kubectl]
+cluster_id: production
+command: get pods -A --field-selector=status.phase!=Running
+
+I found 2 pods with issues:
+- app-backend-7f8d9c-xyz in namespace 'default' (CrashLoopBackOff)
+- prometheus-9d4e2f-def in namespace 'monitoring' (ImagePullBackOff)
+
+Would you like me to investigate why these pods are failing?
+```
+
+## Common Usage Patterns
 
 ### Resource Discovery
 
 ```bash
-# List all pods
-{
-  "command_type": "get",
-  "args": ["pods", "-A"]
-}
+You> List all deployments in the production namespace
+You> Show me all services across all namespaces
+You> What nodes are in my cluster?
+You> List all pods with the label app=nginx
+```
 
-# List nodes
-{
-  "command_type": "get", 
-  "args": ["nodes"]
-}
+### Debugging Issues
 
-# List services
-{
-  "command_type": "get",
-  "args": ["services", "-A"]
-}
-
-# List deployments
-{
-  "command_type": "get",
-  "args": ["deployments", "-A"]
-}
+```bash
+You> Are there any pods crashing?
+You> Show me pods that are not running
+You> What events have occurred in the last 10 minutes?
+You> Why is pod xyz failing?
 ```
 
 ### Resource Details
 
 ```bash
-# Describe a specific pod
-{
-  "command_type": "describe",
-  "args": ["pod", "my-pod", "-n", "default"]
-}
-
-# Describe a node
-{
-  "command_type": "describe", 
-  "args": ["node", "worker-node-1"]
-}
-
-# Get pod details with more info
-{
-  "command_type": "get",
-  "args": ["pod", "my-pod", "-n", "default", "-o", "yaml"]
-}
+You> Describe the nginx deployment
+You> Show me detailed information about pod abc-123
+You> What's the configuration of service my-api?
+You> Get the YAML for deployment backend
 ```
 
-### Filtering and Sorting
+### Resource Usage
 
 ```bash
-# Get pods with specific labels
-{
-  "command_type": "get",
-  "args": ["pods", "-l", "app=nginx", "-A"]
-}
-
-# Get events sorted by time
-{
-  "command_type": "get", 
-  "args": ["events", "--sort-by=.metadata.creationTimestamp"]
-}
-
-# Get pods in specific namespace
-{
-  "command_type": "get",
-  "args": ["pods", "-n", "production"]
-}
-
-# Get resources with field selectors
-{
-  "command_type": "get",
-  "args": ["pods", "-A", "--field-selector=status.phase!=Running"]
-}
+You> What's the CPU and memory usage on my nodes?
+You> Show me the top 10 pods by memory usage
+You> Which pods are using the most CPU?
+You> What's the resource usage in namespace production?
 ```
 
-### Resource Documentation
+### Filtering and Analysis
 
 ```bash
-# Explain pod resource
-{
-  "command_type": "explain",
-  "args": ["pod"]
-}
-
-# Explain specific field
-{
-  "command_type": "explain",
-  "args": ["pod.spec.containers"]
-}
+You> Find all pods with restarts greater than 5
+You> Show me pods older than 7 days
+You> List all services of type LoadBalancer
+You> What pods are in pending state?
 ```
 
-### Cluster Information
+## A2A Integration (Multi-Agent Systems)
 
-```bash
-# Get cluster version
-{
-  "command_type": "version"
-}
+For multi-agent systems, Kubently implements the A2A (Agent-to-Agent) protocol.
 
-# Get cluster info
-{
-  "command_type": "cluster-info"
-}
+### A2A Endpoint
+
+```
+POST http://your-kubently-api:8080/a2a/
 ```
 
-## Output Formats
+### Example A2A Request
 
-Kubently supports different output formats:
-
-### JSON Output
-```bash
-{
-  "command_type": "get",
-  "args": ["pods", "-n", "default", "-o", "json"]
-}
-```
-
-### YAML Output  
-```bash
-{
-  "command_type": "get",
-  "args": ["deployment", "nginx", "-n", "default", "-o", "yaml"]
-}
-```
-
-### Wide Output (More Columns)
-```bash
-{
-  "command_type": "get", 
-  "args": ["pods", "-A", "-o", "wide"]
-}
-```
-
-### Custom Columns
-```bash
-{
-  "command_type": "get",
-  "args": ["pods", "-A", "-o", "custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName"]
-}
-```
-
-## Session Management
-
-### Session Lifecycle
-
-1. **Creation**: `POST /debug/session`
-2. **Active**: Execute commands
-3. **Expiration**: Auto-cleanup after 1 hour
-4. **Manual Close**: `DELETE /debug/session/{id}`
-
-### Session Information
-
-```bash
-# Get session details
-curl -X GET http://your-api:8080/debug/session/sess_abc123def456 \
-  -H "X-API-Key: your-api-key"
-```
-
-Response:
 ```json
 {
-  "session_id": "sess_abc123def456",
-  "cluster_id": "production",
-  "status": "active", 
-  "created_at": "2024-01-20T10:30:45Z",
-  "expires_at": "2024-01-20T11:30:45Z",
-  "last_activity": "2024-01-20T10:32:15Z",
-  "commands_executed": 5
+  "jsonrpc": "2.0",
+  "method": "message/stream",
+  "params": {
+    "message": {
+      "messageId": "msg-123",
+      "role": "user",
+      "parts": [
+        {
+          "partId": "part-1",
+          "text": "Check if there are any pods in crashloopbackoff in the production cluster"
+        }
+      ]
+    }
+  },
+  "id": 1
 }
 ```
 
-### Multiple Sessions
+### A2A Response (Server-Sent Events)
 
-You can have multiple active sessions:
-
-```bash
-# Session for different clusters
-curl -X POST http://your-api:8080/debug/session \
-  -d '{"cluster_id": "staging"}'
-
-curl -X POST http://your-api:8080/debug/session \
-  -d '{"cluster_id": "development"}'
+```
+data: {"type": "tool_call", "tool": "execute_kubectl", "parameters": {"cluster_id": "production", "command": "get pods -A"}}
+data: {"type": "content", "content": "I found 2 pods in CrashLoopBackOff state..."}
+data: {"type": "done"}
 ```
 
-## Error Handling
+### A2A Features
 
-### Common Error Responses
+- **Streaming responses**: Real-time updates via SSE
+- **Tool call visibility**: See exactly what kubectl commands are executed
+- **Context management**: Multi-turn conversations with thread IDs
+- **Automatic investigation**: Agent plans and executes systematic debugging
 
-**Invalid Command:**
-```json
-{
-  "error": "invalid_command",
-  "message": "Command type 'create' is not allowed", 
-  "details": {
-    "allowed_commands": ["get", "describe", "explain", "version", "cluster-info"]
-  }
-}
-```
+See the [Multi-Agent Integration Guide](/guides/multi-agent/) for complete A2A documentation.
 
-**Session Not Found:**
-```json
-{
-  "error": "session_not_found",
-  "message": "Session sess_invalid not found"
-}
-```
+## Agent Investigation Workflow
 
-**Cluster Unavailable:**
-```json
-{
-  "error": "cluster_unavailable", 
-  "message": "Cluster 'production' agent is not connected",
-  "details": {
-    "last_seen": "2024-01-20T09:30:00Z"
-  }
-}
-```
+The Kubently agent follows a systematic approach:
 
-**Command Timeout:**
-```json
-{
-  "error": "command_timeout",
-  "message": "Command timed out after 30 seconds"
-}
-```
+### 1. Cluster Selection
+If you don't specify a cluster, the agent will:
+- List available clusters
+- Ask you to choose one
 
-### Error Recovery
+### 2. Assessment Phase
+The agent starts by understanding the problem:
+- Gathers initial cluster state
+- Identifies areas of concern
+- Creates a todo list for investigation
 
-1. **Retry with exponential backoff**
-2. **Check cluster connectivity** 
-3. **Verify session is still active**
-4. **Create new session if expired**
+### 3. Investigation Phase
+The agent systematically checks each concern:
+- Executes targeted kubectl commands
+- Analyzes output for anomalies
+- Updates todo list as it progresses
+- Follows leads to deeper issues
 
-## Performance Tips
+### 4. Analysis Phase
+The agent correlates findings:
+- Identifies root causes
+- Explains relationships between issues
+- Suggests remediation steps
 
-### Efficient Queries
-
-```bash
-# Use limits to avoid large responses
-{
-  "command_type": "get",
-  "args": ["pods", "-A", "--limit=50"]
-}
-
-# Use field selectors to filter server-side
-{
-  "command_type": "get", 
-  "args": ["pods", "-A", "--field-selector=status.phase=Running"]
-}
-
-# Use label selectors efficiently
-{
-  "command_type": "get",
-  "args": ["pods", "-l", "app=nginx,version=v1.0"]
-}
-```
-
-### Session Reuse
-
-```bash
-# Reuse sessions for multiple related commands
-session_id="sess_abc123def456"
-
-# Execute multiple commands in the same session
-curl -X POST .../debug/execute -d '{"session_id": "'$session_id'", ...}'
-curl -X POST .../debug/execute -d '{"session_id": "'$session_id'", ...}'
-curl -X POST .../debug/execute -d '{"session_id": "'$session_id'", ...}'
-```
-
-### Caching
-
-Results are cached briefly to improve performance:
-- Same command in same session may return cached result
-- Cache TTL is typically 30 seconds
-- Cache is automatically invalidated when session closes
+### 5. Summary
+The agent provides:
+- Clear explanation of problems found
+- Recommended next steps
+- Opportunity for follow-up questions
 
 ## Best Practices
 
-### Security
-- Always use HTTPS in production
-- Rotate API keys regularly
-- Use least privilege access patterns
-- Close sessions when done
+### Effective Questions
 
-### Performance  
-- Reuse sessions for related commands
-- Use field/label selectors to reduce data transfer
-- Set appropriate timeouts
-- Limit result sets with `--limit`
+**Good:**
+- "Show me pods that are failing"
+- "Why is the nginx deployment not ready?"
+- "What's using the most memory?"
 
-### Debugging Workflow
-1. Start with broad queries (`get pods -A`)
-2. Narrow down to specific resources
-3. Use `describe` for detailed information
-4. Check events for troubleshooting context
-5. Clean up sessions when done
+**Less Effective:**
+- "Debug" (too vague)
+- "Fix my cluster" (Kubently is read-only)
+- Single-word queries (provide context)
 
-### Monitoring
-- Track session creation/cleanup
-- Monitor command execution times
-- Alert on high error rates
-- Log security-relevant events
+### Investigation Tips
+
+1. **Start broad, then narrow**: Begin with "Are there any issues?" then drill into specifics
+2. **Ask follow-ups**: The agent maintains context across questions
+3. **Be specific about namespaces**: If investigating a specific app, mention the namespace
+4. **Request explanations**: Ask "Why?" to get deeper analysis
+
+### Multi-Cluster Usage
+
+```bash
+# Add multiple clusters
+kubently cluster add production
+kubently cluster add staging
+kubently cluster add development
+
+# List clusters
+kubently cluster list
+
+# Debug specific cluster
+kubently debug production
+```
+
+### Security Considerations
+
+- Kubently is **read-only by default** - no destructive operations
+- Commands are **validated** before execution
+- **RBAC permissions** are enforced at the Kubernetes level
+- **Dangerous verbs** (delete, create, etc.) are blocked
+- Sessions use **API key authentication**
+
+## Troubleshooting
+
+### Agent Not Responding
+
+```bash
+# Check API connectivity
+curl http://localhost:8080/health
+
+# Check logs
+kubectl logs -l app=kubently-api -n kubently
+```
+
+### No Clusters Available
+
+```bash
+# List registered clusters
+kubently cluster list
+
+# Add a cluster
+kubently cluster add my-cluster
+
+# Check cluster status
+kubently cluster status my-cluster
+```
+
+### Commands Timing Out
+
+- Check executor connectivity: `kubectl logs -l app=kubently-executor -n kubently`
+- Verify network connectivity between API and executors
+- Check Redis connectivity
+
+See the [Troubleshooting Guide](/guides/troubleshooting/) for more help.
 
 ## Next Steps
 
-- [Multi-Agent Integration](/guides/multi-agent/) - Connect with AI systems
+- [CLI Guide](/guides/cli/) - Complete CLI documentation
+- [Multi-Agent Integration](/guides/multi-agent/) - A2A protocol and multi-agent systems
 - [Security Guide](/guides/security/) - Production security practices
-- [API Reference](/api/) - Complete API documentation
+- [API Reference](/api/) - REST API for custom integrations
 - [Troubleshooting](/guides/troubleshooting/) - Common issues and solutions

@@ -4,8 +4,6 @@ title: Installation
 permalink: /installation/
 ---
 
-# Installation Guide
-
 This guide covers installing Kubently in various environments, from local development to production clusters.
 
 <div class="alert alert-info">
@@ -14,7 +12,7 @@ This guide covers installing Kubently in various environments, from local develo
 
 ## Prerequisites
 
-- Kubernetes cluster (1.24+) or Kind for local testing
+- Kubernetes cluster (1.28+) or Kind for local testing
 - kubectl configured
 - Helm 3.x installed (required for Helm deployment)
 - At least one LLM API key (Google, Anthropic, OpenAI, or any LLMFactory-supported provider)
@@ -248,14 +246,23 @@ kubectl create secret generic kubently-executor-token \
 
 #### Using the CLI
 
+The Kubently CLI provides an interactive terminal interface for debugging Kubernetes clusters. For complete installation instructions and usage guide, see the [CLI Guide](/guides/cli/).
+
+**Quick Test:**
+
 ```bash
 # Install the Node.js CLI
 cd kubently-cli/nodejs
 npm install && npm run build && npm link
 
-# Test with the CLI
-kubently --api-url http://localhost:8080 --api-key test-api-key debug
+# Initialize configuration
+kubently init
+
+# Start debugging
+kubently debug
 ```
+
+See the [CLI Guide](/guides/cli/) for detailed documentation on all CLI commands and features.
 
 #### Using the Test Automation
 

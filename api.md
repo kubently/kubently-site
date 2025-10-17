@@ -4,8 +4,6 @@ title: API Reference
 permalink: /api/
 ---
 
-# API Reference
-
 Kubently provides a comprehensive REST API for debugging sessions, kubectl command execution, and A2A (Agent-to-Agent) protocol support for multi-agent systems.
 
 ## Base URLs
@@ -387,61 +385,28 @@ Example tool call event:
 }
 ```
 
-## WebSocket API (Future)
+## Usage Examples
 
-*Coming soon: Real-time WebSocket API for streaming command output and session events.*
+### Using the CLI (Recommended)
 
-## SDK Examples
+The Kubently CLI provides the easiest way to interact with Kubently:
 
-### Python SDK
+```bash
+# Initialize configuration
+kubently init
 
-```python
-import kubently
+# Start interactive debug session
+kubently debug production-cluster
 
-# Initialize client
-client = kubently.Client(
-    endpoint="http://your-kubently-api:8080",
-    api_key="your-api-key"
-)
-
-# Create session and execute commands
-async with client.debug_session("production-cluster") as session:
-    # Get all pods
-    result = await session.execute("get", ["pods", "-A"])
-    print(result.output)
-    
-    # Describe specific pod
-    result = await session.execute("describe", ["pod", "my-pod", "-n", "default"])
-    print(result.output)
+# Ask natural language questions
+You> What pods are running in the default namespace?
+You> Show me any pods with issues
+You> Describe the failing pod in namespace myapp
 ```
 
-### JavaScript SDK
+See the [CLI Guide](/guides/cli/) for complete documentation.
 
-```javascript
-const kubently = require('kubently-js');
-
-const client = new kubently.Client({
-  endpoint: 'http://your-kubently-api:8080',
-  apiKey: 'your-api-key'
-});
-
-// Create session and execute commands
-const session = await client.createDebugSession('production-cluster');
-
-try {
-  // Get all pods
-  const podsResult = await client.execute(session.sessionId, 'get', ['pods', '-A']);
-  console.log(podsResult.output);
-  
-  // Describe specific pod
-  const describeResult = await client.execute(session.sessionId, 'describe', ['pod', 'my-pod', '-n', 'default']);
-  console.log(describeResult.output);
-} finally {
-  await client.closeSession(session.sessionId);
-}
-```
-
-### cURL Examples
+### Using curl (Direct API Access)
 
 ```bash
 # Create a debug session

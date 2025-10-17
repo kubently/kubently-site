@@ -4,8 +4,6 @@ title: Quick Start Guide
 permalink: /guides/quick-start/
 ---
 
-# Quick Start Guide
-
 This guide will get you up and running with Kubently in under 10 minutes.
 
 ## Prerequisites
@@ -75,180 +73,130 @@ kubently-api-5f6d7e8g9-abc456     1/1     Running   0          2m
 redis-6789abc-def012              1/1     Running   0          2m
 ```
 
-## Step 3: First API Call
-
-### Get the API Endpoint
-
-```bash
-# For Kind clusters
-export API_ENDPOINT="localhost:8080"
-
-# For other clusters, get the service endpoint
-# kubectl port-forward svc/kubently-api 8080:8080 -n kubently &
-# export API_ENDPOINT="localhost:8080"
-```
-
-### Create a Debug Session
-
-```bash
-# Create a debugging session
-curl -X POST http://$API_ENDPOINT/debug/session \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"cluster_id": "default"}' | jq
-```
-
-Expected response:
-```json
-{
-  "session_id": "sess_abc123def456",
-  "cluster_id": "default",
-  "status": "active",
-  "created_at": "2024-01-20T10:30:45Z"
-}
-```
-
-### Execute Your First Command
-
-```bash
-# Store the session ID
-export SESSION_ID="sess_abc123def456"  # Replace with actual session ID
-
-# Execute a kubectl command
-curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "default",
-    "session_id": "'$SESSION_ID'",
-    "command_type": "get",
-    "args": ["pods", "-A", "--limit=5"]
-  }' | jq
-```
-
-Expected response:
-```json
-{
-  "result_id": "res_xyz789abc123",
-  "status": "completed",
-  "output": "NAMESPACE     NAME                    READY   STATUS    RESTARTS   AGE\nkube-system   coredns-558bd4d5db-abc  1/1     Running   0          5m\n...",
-  "error": null,
-  "execution_time_ms": 234
-}
-```
-
-## Step 4: Explore More Commands
-
-### List Nodes
-```bash
-curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "default",
-    "session_id": "'$SESSION_ID'",
-    "command_type": "get",
-    "args": ["nodes"]
-  }'
-```
-
-### Describe a Pod
-```bash
-curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "default",
-    "session_id": "'$SESSION_ID'",
-    "command_type": "describe",
-    "args": ["pod", "coredns-558bd4d5db-abc", "-n", "kube-system"]
-  }'
-```
-
-### Get Events
-```bash
-curl -X POST http://$API_ENDPOINT/debug/execute \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_id": "default",
-    "session_id": "'$SESSION_ID'",
-    "command_type": "get",
-    "args": ["events", "--sort-by=.metadata.creationTimestamp"]
-  }'
-```
-
-## Step 5: Using the CLI (Optional)
+## Step 3: Install and Configure the CLI
 
 ### Install the CLI
-```bash
-# Install from the repository
-cd kubently-cli
-pip install -e .
 
-# Or install from PyPI (when available)
-# pip install kubently-cli
+```bash
+# Navigate to the CLI directory
+cd kubently-cli/nodejs
+
+# Install dependencies and build
+npm install && npm run build
+
+# Create global CLI command
+npm link
 ```
 
 ### Configure the CLI
+
 ```bash
-# Set up configuration
-kubently config set-api-endpoint http://$API_ENDPOINT
-kubently config set-api-key $API_KEY
+# Initialize configuration interactively
+kubently init
+
+# You'll be prompted for:
+# - API URL: http://localhost:8080
+# - API Key: (use the $API_KEY from Step 1)
 ```
 
-### Use the CLI
+Alternatively, use environment variables:
+
 ```bash
-# Create a session
-kubently session create --cluster-id default
+# Set environment variables
+export KUBENTLY_API_URL="http://localhost:8080"
+export KUBENTLY_API_KEY="$API_KEY"
+```
 
-# Execute commands
-kubently exec get pods -A
-kubently exec describe node <node-name>
-kubently exec get events --sort-by=.metadata.creationTimestamp
+## Step 4: Start Your First Debug Session
 
-# List active sessions
-kubently session list
+### Interactive Debugging
 
-# Close session
-kubently session close <session-id>
+The easiest way to get started is with the interactive debug mode:
+
+```bash
+# Start an interactive debug session
+kubently debug
+
+# Or specify a cluster
+kubently debug default
+```
+
+This opens an interactive terminal where you can ask natural language questions:
+
+```
+🚀 Kubently CLI v2.0.0
+
+Connected to: http://localhost:8080
+Cluster: default
+
+You> What pods are running in the kube-system namespace?
+
+Agent> Let me check that for you...
+
+I found the following pods in the kube-system namespace:
+- coredns-558bd4d5db-abc (Running)
+- etcd-kind-control-plane (Running)
+- kube-apiserver-kind-control-plane (Running)
+...
+
+You> Are there any pods with issues?
+
+Agent> Checking for problematic pods across all namespaces...
+
+All pods appear to be healthy. No pods found in CrashLoopBackOff,
+Error, or Pending states.
+```
+
+### CLI Commands
+
+You can also use discrete commands for cluster management:
+
+```bash
+# List all registered clusters
+kubently cluster list
+
+# Check cluster status
+kubently cluster status default
+
+# Add a new cluster
+kubently cluster add production
 ```
 
 ## Common Patterns
 
 ### Debugging Pod Issues
+
+Use the interactive CLI for natural language debugging:
+
 ```bash
-# Get pods with issues
-kubently exec get pods -A --field-selector=status.phase!=Running
+kubently debug
 
-# Describe problematic pods
-kubently exec describe pod <pod-name> -n <namespace>
-
-# Check pod logs (if available via events)
-kubently exec get events --field-selector=involvedObject.name=<pod-name>
+You> Show me all pods that are not running
+You> Describe the pod named <pod-name> in namespace <namespace>
+You> What events are related to pod <pod-name>?
 ```
 
 ### Resource Investigation
+
+Ask the agent to investigate resources:
+
 ```bash
-# Check resource usage
-kubently exec top nodes
-kubently exec top pods -A
+kubently debug
 
-# Get resource quotas
-kubently exec get resourcequota -A
-
-# Check persistent volumes
-kubently exec get pv,pvc -A
+You> What is the resource usage on my nodes?
+You> Show me all resource quotas
+You> Are there any persistent volume issues?
 ```
 
 ## Next Steps
 
 Now that you have Kubently running:
 
-1. **Explore the [API Reference](/api/)** - Learn about all available endpoints
-2. **Read the [Security Guide](/guides/security/)** - Understand security best practices
-3. **Try [Multi-Agent Integration](/guides/multi-agent/)** - Connect with AI systems
-4. **Review [Troubleshooting](/guides/troubleshooting/)** - Common issues and solutions
+1. **Read the [CLI Guide](/guides/cli/)** - Complete CLI documentation and advanced features
+2. **Try [Multi-Agent Integration](/guides/multi-agent/)** - Connect with A2A multi-agent systems
+3. **Read the [Security Guide](/guides/security/)** - Understand security best practices
+4. **Explore the [API Reference](/api/)** - REST API documentation for custom integrations
+5. **Review [Troubleshooting](/guides/troubleshooting/)** - Common issues and solutions
 
 ## Troubleshooting
 

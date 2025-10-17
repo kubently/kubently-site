@@ -5,8 +5,6 @@ permalink: /guides/a2a-integration/
 parent: Guides
 ---
 
-# A2A and Multi-Agent Integration
-
 Kubently provides native support for Agent-to-Agent (A2A) communication and multi-agent system integration, enabling AI agents to collaborate on Kubernetes debugging tasks.
 
 ## Overview

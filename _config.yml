@@ -2,7 +2,7 @@ title: Kubently
 description: Troubleshoot Kubernetes agentically with AI-powered conversational debugging - Real-time cluster insights through natural language
 url: "https://kubently.io"
 baseurl: ""
-logo: "/assets/images/kubently-logo.svg"
+logo: "/assets/images/kubently-logo-cropped.jpg"
 
 markdown: kramdown
 highlighter: rouge
@@ -32,7 +32,6 @@ plugins:
   - jekyll-seo-tag
 
 header_pages:
-  - index.md
   - installation.md
   - guides.md
   - api.md
@@ -49,6 +48,8 @@ navigation:
     children:
       - title: "Quick Start"
         url: "/guides/quick-start/"
+      - title: "CLI Guide"
+        url: "/guides/cli/"
       - title: "Multi-Agent Systems"
         url: "/guides/multi-agent/"
       - title: "Security"

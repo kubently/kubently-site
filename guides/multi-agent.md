@@ -4,18 +4,15 @@ title: Multi-Agent Systems Integration
 permalink: /guides/multi-agent/
 ---
 
-# Multi-Agent Systems Integration
-
 Kubently is designed from the ground up to work seamlessly with AI agents and multi-agent systems. This guide covers how to integrate Kubently with LLMs, AI agents, and Agent-to-Agent (A2A) communication systems.
 
 ## Overview
 
 Kubently provides several integration methods for AI systems:
 
-1. **Direct API Integration** - REST API for basic integration
-2. **A2A Protocol Support** - Agent-to-Agent communication
-3. **MCP Tool Exposure** - Model Context Protocol for LLM tools
-4. **Webhook Integration** - Asynchronous event handling
+1. **A2A Protocol** - Native Agent-to-Agent communication with streaming responses
+2. **Direct REST API** - Standard HTTP API for basic integration
+3. **CLI Integration** - Command-line interface for scripts and automation
 
 ## A2A (Agent-to-Agent) Communication
 
@@ -94,138 +91,117 @@ class KubentlyA2AClient:
             )
 ```
 
-## MCP (Model Context Protocol) Integration
+## A2A Protocol Integration
 
-### Available MCP Tools
+### What is the A2A Protocol?
 
-Kubently exposes these tools via MCP for LLM integration:
+The A2A (Agent-to-Agent) protocol is an industry-standard protocol for agent communication. Kubently implements the A2A protocol specification, providing a streaming interface for LLM agents to interact with Kubernetes clusters.
 
-```python
-# MCP Tool Definitions
-mcp_tools = [
-    {
-        "name": "create_debug_session",
-        "description": "Create a new Kubernetes debugging session",
-        "parameters": {
-            "cluster_id": {"type": "string", "required": True},
-            "correlation_id": {"type": "string", "required": False}
-        }
+### A2A Endpoint
+
+The A2A server is mounted at `/a2a/` on the main Kubently API:
+
+```bash
+# A2A endpoint
+http://your-kubently-api:8080/a2a/
+
+# Example A2A request
+curl -X POST http://localhost:8080/a2a/ \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "message/stream",
+    "params": {
+      "message": {
+        "messageId": "msg-1",
+        "role": "user",
+        "parts": [{"partId": "part-1", "text": "List all pods in the default namespace"}]
+      }
     },
-    {
-        "name": "execute_kubectl",
-        "description": "Execute a kubectl command in a debug session",
-        "parameters": {
-            "session_id": {"type": "string", "required": True},
-            "command": {"type": "string", "required": True},
-            "timeout": {"type": "number", "default": 30}
-        }
-    },
-    {
-        "name": "get_command_result",
-        "description": "Get the result of a previously executed command",
-        "parameters": {
-            "result_id": {"type": "string", "required": True}
-        }
-    },
-    {
-        "name": "close_session",
-        "description": "Close a debug session and clean up resources",
-        "parameters": {
-            "session_id": {"type": "string", "required": True}
-        }
-    }
-]
+    "id": 1
+  }'
 ```
 
-### MCP Server Implementation
+### Internal Tools
 
-```python
-from mcp import Server
-import kubently_client
+Kubently's A2A server uses LangGraph/LangChain to provide an LLM agent with access to these internal tools:
 
-class KubentlyMCPServer(Server):
-    def __init__(self, kubently_endpoint, api_key):
-        super().__init__("kubently-mcp-server")
-        self.client = kubently_client.Client(kubently_endpoint, api_key)
-        
-    @self.tool("create_debug_session")
-    async def create_debug_session(self, cluster_id: str, correlation_id: str = None):
-        """Create a new debugging session"""
-        session = await self.client.create_session(cluster_id, correlation_id)
-        return {
-            "session_id": session.id,
-            "cluster_id": session.cluster_id,
-            "status": session.status
-        }
-    
-    @self.tool("execute_kubectl")
-    async def execute_kubectl(self, session_id: str, command: str, timeout: int = 30):
-        """Execute a kubectl command"""
-        # Parse command into components
-        parts = command.split()
-        command_type = parts[0] if parts else "get"
-        args = parts[1:] if len(parts) > 1 else []
-        
-        result = await self.client.execute_command(
-            session_id=session_id,
-            command_type=command_type,
-            args=args,
-            timeout=timeout
-        )
-        
-        return {
-            "result_id": result.id,
-            "output": result.output,
-            "status": result.status,
-            "execution_time_ms": result.execution_time_ms
-        }
+- **`list_clusters()`** - List all available Kubernetes clusters
+- **`execute_kubectl(cluster_id, command, namespace, extra_args)`** - Execute kubectl commands with safety validation
+- **`todo_write(todos)`** - Manage systematic debugging workflow and track investigation progress
+
+These tools are used internally by the A2A server's LLM agent and are not directly exposed as external APIs.
+
+### Using the A2A Protocol
+
+The easiest way to interact with Kubently's A2A server is through the CLI:
+
+```bash
+# Start interactive A2A session
+kubently debug production-cluster
+
+# Ask natural language questions
+You> What pods are in crashloopbackoff?
+You> Show me the events for the failing pod
+You> What's causing the database connection issues?
 ```
+
+See the [CLI Guide](/guides/cli/) for more details.
 
 ## LLM Prompt Engineering
 
 ### System Prompt for Kubernetes Debugging
 
+This is the system prompt used by Kubently's built-in A2A agent:
+
 ```markdown
-You are a Kubernetes debugging assistant with access to the Kubently API.
+You are a Kubernetes debugging assistant with access to kubectl commands.
 
 ## Available Tools
 
-You have access to these Kubently tools:
-- create_debug_session(cluster_id): Create a new debugging session
-- execute_kubectl(session_id, command): Execute kubectl commands
-- get_command_result(result_id): Get command results
-- close_session(session_id): Close debugging session
+You have access to these internal tools:
+- list_clusters(): List all available Kubernetes clusters
+- execute_kubectl(cluster_id, command, namespace, extra_args): Execute kubectl commands
+- todo_write(todos): Track your debugging investigation steps
 
 ## Debugging Workflow
 
-1. **Assessment Phase**
-   - Create a debug session for the target cluster
-   - Gather initial cluster state (nodes, pods, events)
-   - Identify problematic resources
+1. **Cluster Selection**
+   - If the user doesn't specify a cluster, use list_clusters() to show options
+   - Ask the user which cluster to investigate
 
-2. **Investigation Phase**
+2. **Assessment Phase**
+   - Use execute_kubectl to gather initial cluster state (nodes, pods, events)
+   - Identify problematic resources
+   - Use todo_write to track your investigation plan
+
+3. **Investigation Phase**
    - Focus on specific namespaces or resources
    - Use describe commands for detailed information
    - Check resource relationships and dependencies
+   - Update your todo list as you progress
 
-3. **Analysis Phase**
+4. **Analysis Phase**
    - Correlate findings across different resource types
    - Identify root causes and contributing factors
    - Suggest remediation steps
 
-4. **Cleanup Phase**
-   - Close the debug session when done
+5. **Summary Phase**
    - Summarize findings and recommendations
+   - Complete remaining todos
 
 ## Security Guidelines
 
-- Only use read-only kubectl commands (get, describe, logs via events)
-- Never attempt to modify cluster state
+- Only use read-only kubectl commands (get, describe, logs, top, explain)
+- Never attempt dangerous operations (delete, create, apply, patch, etc.)
+- Commands with dangerous verbs will be blocked automatically
 - Respect namespace boundaries and RBAC permissions
-- Always close sessions when debugging is complete
 
 ## Best Practices
 
+- Be systematic and thorough in your investigations
+- Use todo_write to track your debugging steps
 - Start with broad queries, then narrow down
 - Use field selectors and label selectors efficiently
 - Cross-reference events with resource states
@@ -237,24 +213,19 @@ You have access to these Kubently tools:
 ```markdown
 Human: The pods in my production cluster are crashing. Can you help debug this?
 
-Assistant: I'll help debug your production cluster. Let me start by creating a session and checking for problematic pods.
-
-[Tool: create_debug_session]
-cluster_id: production
-
-[Result: Session created successfully - sess_abc123]
+Agent: I'll help debug your production cluster. Let me start by checking for problematic pods.
 
 [Tool: execute_kubectl]
-session_id: sess_abc123
-command: get pods -A --field-selector=status.phase\!=Running
+cluster_id: production
+command: get pods -A --field-selector=status.phase!=Running
 
-[Result: Found 3 pods in CrashLoopBackOff state]
+[Result: Found 3 pods not running]
 - default/app-backend-7f8d9c-xyz (CrashLoopBackOff, 15 restarts)
 - default/app-worker-6b5c8d-abc (CrashLoopBackOff, 12 restarts)
 - monitoring/prometheus-9d4e2f-def (ImagePullBackOff)
 
 [Tool: execute_kubectl]
-session_id: sess_abc123
+cluster_id: production
 command: describe pod app-backend-7f8d9c-xyz -n default
 
 [Analysis]
@@ -269,9 +240,6 @@ I've identified the issues:
    - Error: "Failed to pull image prometheus:v2.50.0"
    - Root cause: Image tag doesn't exist in registry
    - Recommendation: Verify image tag or use latest stable version
-
-[Tool: close_session]
-session_id: sess_abc123
 
 Would you like me to investigate the PostgreSQL connectivity issue further?
 ```

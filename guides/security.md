@@ -4,8 +4,6 @@ title: Security Guide
 permalink: /guides/security/
 ---
 
-# Security Guide
-
 Security is a core principle in Kubently's design. This guide covers security best practices for deploying and using Kubently in production environments.
 
 ## Security Architecture
@@ -418,6 +416,7 @@ SECURITY_EVENTS = [
 
 ### Monitoring Rules
 
+{% raw %}
 ```yaml
 # Prometheus alerting rules
 groups:
@@ -429,7 +428,7 @@ groups:
     annotations:
       summary: High rate of authentication failures
       description: "Authentication failure rate is {{ $value }} per second"
-  
+
   - alert: KubentlyUnauthorizedCommands
     expr: increase(kubently_unauthorized_commands_total[5m]) > 0
     for: 0m
@@ -444,6 +443,7 @@ groups:
       summary: Kubently agent disconnected
       description: "Agent for cluster {{ $labels.cluster_id }} has been disconnected for 5+ minutes"
 ```
+{% endraw %}
 
 ## Security Best Practices
 

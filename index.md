@@ -6,7 +6,7 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
 
 <div class="hero">
   <div class="hero-content">
-    <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 180px; margin-bottom: 1.5rem;">
+    <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" style="height: 200px; margin: 0; mix-blend-mode: multiply;">
     <p class="hero-subtitle">Troubleshoot Kubernetes agentically with AI-powered conversational debugging that enables natural language interactions and real-time cluster insights</p>
     
     <div class="badges">

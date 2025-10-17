@@ -10,13 +10,19 @@ permalink: /guides/
     <h3 class="feature-title"><a href="quick-start/">Quick Start</a></h3>
     <p class="feature-description">Get up and running with Kubently in under 10 minutes</p>
   </div>
-  
+
+  <div class="feature">
+    <span class="feature-icon">💻</span>
+    <h3 class="feature-title"><a href="cli/">CLI Guide</a></h3>
+    <p class="feature-description">Interactive terminal interface for debugging Kubernetes clusters</p>
+  </div>
+
   <div class="feature">
     <span class="feature-icon">📖</span>
     <h3 class="feature-title"><a href="basic-usage/">Basic Usage</a></h3>
     <p class="feature-description">Learn fundamental concepts and everyday operations</p>
   </div>
-  
+
   <div class="feature">
     <span class="feature-icon">🤖</span>
     <h3 class="feature-title"><a href="multi-agent/">Multi-Agent Systems</a></h3>
