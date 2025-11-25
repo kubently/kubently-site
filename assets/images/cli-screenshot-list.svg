@@ -1,0 +1,53 @@
+<svg width="800" height="320" viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bg { fill: #1e293b; } /* Slate 800 */
+    .header { fill: #0f172a; } /* Slate 900 */
+    .dot-red { fill: #ff5f56; }
+    .dot-yellow { fill: #ffbd2e; }
+    .dot-green { fill: #27c93f; }
+    .text { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 13px; fill: #e2e8f0; white-space: pre; }
+    .prompt { fill: #60a5fa; font-weight: bold; } /* Blue 400 */
+    .success { fill: #4ade80; } /* Green 400 */
+    .header-row { fill: #2dd4bf; font-weight: bold; } /* Teal 400 */
+    .dim { fill: #94a3b8; }
+    .cursor { animation: blink 1s infinite; fill: #60a5fa; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+
+  <!-- Terminal Window -->
+  <rect x="0" y="0" width="800" height="320" rx="12" ry="12" class="bg"/>
+  <path d="M0 12 C0 5 5 0 12 0 L788 0 C795 0 800 5 800 12 L800 40 L0 40 Z" class="header"/>
+
+  <!-- Window Controls -->
+  <circle cx="25" cy="20" r="6" class="dot-red"/>
+  <circle cx="45" cy="20" r="6" class="dot-yellow"/>
+  <circle cx="65" cy="20" r="6" class="dot-green"/>
+  <text x="400" y="25" text-anchor="middle" class="text dim" font-size="12">kubently-cli — 80x24</text>
+
+  <!-- Content -->
+  <g transform="translate(20, 70)">
+    <!-- Command -->
+    <text x="0" y="0" class="text"><tspan class="prompt">$</tspan> kubently cluster list</text>
+    
+    <!-- Table Header -->
+    <text x="0" y="40" class="text header-row">┌────────────────────┬────────────┬──────────────────────┐</text>
+    <text x="0" y="60" class="text header-row">│ Cluster ID         │ Status     │ Last Seen            │</text>
+    <text x="0" y="80" class="text header-row">├────────────────────┼────────────┼──────────────────────┤</text>
+    
+    <!-- Row 1 -->
+    <text x="0" y="100" class="text">│ production         │ <tspan class="success">● online</tspan>   │ 2025-11-20 10:30:00  │</text>
+    
+    <!-- Row 2 -->
+    <text x="0" y="120" class="text">│ staging            │ <tspan class="success">● online</tspan>   │ 2025-11-20 10:29:45  │</text>
+
+    <!-- Row 3 -->
+    <text x="0" y="140" class="text">│ dev-cluster-01     │ <tspan class="dim">○ offline</tspan>  │ 2025-11-19 18:15:22  │</text>
+
+    <!-- Table Footer -->
+    <text x="0" y="160" class="text header-row">└────────────────────┴────────────┴──────────────────────┘</text>
+
+    <!-- Prompt -->
+    <text x="0" y="200" class="text"><tspan class="prompt">$</tspan> <tspan class="cursor">_</tspan></text>
+
+  </g>
+</svg>

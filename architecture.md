@@ -10,38 +10,9 @@ Kubently follows a modular, black-box architecture where each component exposes 
 
 ### High-Level Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         External Clients                         │
-│                   (AI Services, CLI, Web UI, A2A)               │
-└─────────────────┬───────────────────────────────────────────────┘
-                  │ HTTPS
-                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     Kubernetes Ingress/LB                        │
-└─────────────────┬───────────────────────────────────────────────┘
-                  │ Round-robin distribution
-                  ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Kubently API Pods                           │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │  Pod 1   │  │  Pod 2   │  │  Pod 3   │  │  Pod N   │  ...  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘       │
-│       └──────────────┴──────────────┴──────────────┘            │
-│                   Redis Pub/Sub Channel                          │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                  ┌────────────▼────────────┐
-                  │      Redis Cluster       │
-                  │    (Pub/Sub + State)     │
-                  └────────────┬────────────┘
-                               │ SSE Connection
-                               ▼
-                  ┌──────────────────────────┐
-                  │   Kubently Executors      │
-                  │  (One per K8s cluster)    │
-                  └──────────────────────────┘
-```
+<div class="architecture-diagram">
+  <img src="/assets/images/architecture-overview.svg" alt="High-Level Architecture Diagram">
+</div>
 
 ### Design Principles
 
@@ -138,33 +109,9 @@ executor-results:{command_id}   # Command results
 
 ### Command Execution Flow (SSE-based)
 
-```mermaid
-sequenceDiagram
-    participant Client as Client/Agent
-    participant API as Kubently API
-    participant Redis as Redis Pub/Sub
-    participant Executor as Kubently Executor
-    participant K8s as Kubernetes
-
-    Note over Executor,API: Executor maintains persistent SSE connection
-    Executor->>API: GET /executor/stream (SSE)
-    API-->>Executor: SSE connection established
-
-    Client->>API: POST /debug/execute
-    API->>Redis: Publish command
-    Redis-->>Executor: Real-time delivery (~50ms)
-    API-->>Client: Command queued (202)
-
-    Executor->>K8s: Execute kubectl command
-    K8s-->>Executor: Return results
-    Executor->>API: POST /executor/results
-    API->>Redis: Store results
-
-    Client->>API: GET /debug/result/{id}
-    API->>Redis: Fetch result
-    Redis-->>API: Return result
-    API-->>Client: Return result (200)
-```
+<div class="architecture-diagram">
+  <img src="/assets/images/architecture-sequence.svg" alt="Command Execution Sequence Diagram">
+</div>
 
 ### Session Lifecycle
 

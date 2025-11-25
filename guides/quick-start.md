@@ -9,48 +9,26 @@ This guide will get you up and running with Kubently in under 10 minutes.
 ## Prerequisites
 
 Before you begin, ensure you have:
-- Docker (for local development)
-- Kubernetes cluster & Helm (if deploying to Kubernetes)
+- A Kubernetes cluster (Kind, Minikube, EKS, GKE, etc.)
+- `kubectl` and `helm` installed
 - Node.js 18+ (for the CLI)
 
 ## Step 1: Deploy Kubently
 
-Choose the option that best fits your needs.
-
-### Option 1: Local Development (Docker Compose)
-
-The fastest way to run Kubently locally without a Kubernetes cluster.
+We recommend deploying Kubently via Helm.
 
 ```bash
-# Clone the repository
-git clone https://github.com/kubently/kubently.git
-cd kubently
-
-# Create a .env file with your API key (e.g., Anthropic, OpenAI, or Google)
-echo "ANTHROPIC_API_KEY=your-key-here" > .env
-
-# Start the services
-docker-compose -f deployment/docker-compose.yaml up -d
-
-# Verify services are running
-docker-compose -f deployment/docker-compose.yaml ps
-```
-
-### Option 2: Kubernetes (Helm)
-
-Deploy to Kind or any standard Kubernetes cluster.
-
-```bash
-# Clone the repository
+# Clone the repository to get the chart
 git clone https://github.com/kubently/kubently.git
 cd kubently
 
 # Create namespace
 kubectl create namespace kubently
 
-# Create API Key Secret
+# Create API Key Secret (Replace with your actual key)
+# Supported providers: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY
 kubectl create secret generic kubently-api-keys \
-  --from-literal=ANTHROPIC_API_KEY=your-key \
+  --from-literal=ANTHROPIC_API_KEY=sk-ant-...
   --namespace kubently
 
 # Install with Helm
@@ -63,20 +41,15 @@ helm install kubently ./deployment/helm/kubently \
 
 Ensure the system is running and healthy.
 
-**If using Docker Compose:**
-```bash
-# Check API health
-curl http://localhost:8080/health
-```
-
-**If using Kubernetes:**
 ```bash
 # Wait for pods to be ready
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=kubently -n kubently --timeout=300s
 
-# Port-forward the API
+# Port-forward the API (to make it accessible to the CLI)
 kubectl port-forward -n kubently svc/kubently-api 8080:8080
 ```
+
+> **Note:** In a production environment, you would typically expose the service via an Ingress rather than using port-forwarding.
 
 ## Step 3: Install and Configure the CLI
 
@@ -95,7 +68,7 @@ kubently init
 
 # You'll be prompted for:
 # - API URL: http://localhost:8080 (default)
-# - API Key: (Leave blank if using Docker Compose/Helm defaults for dev)
+# - API Key: (Leave blank if you haven't configured CLI-specific auth yet)
 ```
 
 ## Step 4: Start Your First Debug Session
@@ -108,6 +81,8 @@ Start an interactive session to troubleshoot your cluster:
 # Start debug mode
 kubently debug
 ```
+
+![Kubently Debug Session](/assets/images/cli-screenshot-debug.svg)
 
 You can now ask natural language questions like:
 

@@ -55,6 +55,8 @@ First, configure the CLI with your Kubently API details:
 kubently init
 ```
 
+![Kubently Interactive Menu](/assets/images/cli-screenshot-menu.svg)
+
 This will prompt you for:
 - **Kubently API URL**: The endpoint for your Kubently API (e.g., `http://localhost:8080`)
 - **Admin API Key**: Your API key for authentication
@@ -99,15 +101,7 @@ List all registered clusters.
 kubently cluster list
 ```
 
-**Example output:**
-```
-┌─────────────────┬──────────┬──────────────────────┐
-│ Cluster ID      │ Status   │ Last Seen            │
-├─────────────────┼──────────┼──────────────────────┤
-│ production      │ online   │ 2024-01-20 10:30:00  │
-│ staging         │ online   │ 2024-01-20 10:29:45  │
-└─────────────────┴──────────┴──────────────────────┘
-```
+![Kubently Cluster List Output](/assets/images/cli-screenshot-list.svg)
 
 #### `kubently cluster status <cluster-id>`
 
@@ -157,38 +151,8 @@ kubently debug
 - **Natural language queries** - Ask questions about your cluster
 
 **Example session:**
-```bash
-$ kubently debug production
 
-🚀 Kubently CLI v2.0.0
-
-Connected to: http://localhost:8080
-Cluster: production
-
-You> What pods are in crashloopbackoff?
-
-Agent> Let me check the pods in your cluster...
-
-I found 2 pods in CrashLoopBackOff state:
-1. myapp-backend-7d8f9c-xkj2p in namespace 'default'
-2. cache-redis-0 in namespace 'cache'
-
-Would you like me to investigate the logs for either of these pods?
-
-You> yes, check the backend pod logs
-
-Agent> Analyzing logs for myapp-backend-7d8f9c-xkj2p...
-
-The pod is failing due to:
-- Connection refused to database service on port 5432
-- Possible causes:
-  1. Database service is not running
-  2. Network policy blocking connection
-  3. Incorrect database service name in configuration
-
-Recommendation: Check if the database service is running with:
-kubectl get svc -n default | grep database
-```
+![Kubently Debug Session](/assets/images/cli-screenshot-debug.svg)
 
 ## Configuration
 
