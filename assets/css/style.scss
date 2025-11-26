@@ -255,6 +255,13 @@ h2 {
   }
 }
 
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
 .hero-terminal {
   perspective: 1000px;
 }
@@ -358,11 +365,12 @@ h2 {
   .hero-wrapper {
     grid-template-columns: 1fr;
     text-align: center;
+    padding: 1.5rem;
   }
-  
+
   .hero-text {
     text-align: center;
-    
+
     .hero-subtitle {
       margin-left: auto;
       margin-right: auto;
@@ -370,6 +378,7 @@ h2 {
 
     .hero-buttons {
       justify-content: center;
+      flex-wrap: wrap;
     }
   }
 
@@ -390,6 +399,7 @@ h2 {
   transition: all 0.2s;
   border: none;
   cursor: pointer;
+  box-sizing: border-box;
 
   &.btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -663,7 +673,15 @@ table {
 
 // Responsive Design
 @media (max-width: 768px) {
-  .hero-title {
+  .wrapper {
+    padding: 0 1.5rem;
+  }
+
+  .hero-wrapper {
+    padding: 1.5rem;
+  }
+
+  .hero-text .hero-title {
     font-size: 2.5rem;
   }
 
@@ -673,11 +691,104 @@ table {
 
   .hero-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .main-nav ul {
     flex-direction: column;
+  }
+
+  .terminal-window {
+    min-height: 300px;
+  }
+}
+
+// Small mobile devices
+@media (max-width: 480px) {
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .hero-container {
+    min-height: auto;
+    padding-top: 2rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .hero-wrapper {
+    padding: 0.75rem;
+    gap: 2rem;
+    max-width: 100%;
+  }
+
+  .hero-text {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+
+    .hero-logo {
+      height: 60px;
+    }
+
+    .hero-title {
+      font-size: 1.75rem !important;
+      line-height: 1.2;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      max-width: 100%;
+    }
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+    max-width: 100%;
+  }
+
+  .badges {
+    justify-content: flex-start;
+
+    img {
+      height: 18px;
+    }
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.625rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .terminal-window {
+    min-height: 250px;
+  }
+
+  .terminal-body {
+    font-size: 0.8rem;
+    padding: 1rem;
+    height: auto;
+    min-height: 200px;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .features .feature {
+    padding: 1.5rem;
   }
 }
 
