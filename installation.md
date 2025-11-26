@@ -163,13 +163,21 @@ docker-compose -f deployment/docker-compose.yaml ps
 
 The Kubently CLI provides an interactive terminal interface for debugging.
 
-### Option 1: NPM (Recommended)
+### Install from NPM (Recommended)
 
 ```bash
 npm install -g @kubently/cli
 ```
 
-### Option 2: From Source
+Or using npx (no installation required):
+
+```bash
+npx @kubently/cli
+```
+
+### Install from Source
+
+If you want to contribute or use the latest development version:
 
 ```bash
 # Clone the repository
