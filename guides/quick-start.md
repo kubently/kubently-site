@@ -25,16 +25,27 @@ cd kubently
 # Create namespace
 kubectl create namespace kubently
 
-# Create API Key Secret (Replace with your actual key)
+# Create LLM API Key Secret (Replace with your actual key)
 # Supported providers: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY
-kubectl create secret generic kubently-api-keys \
-  --from-literal=ANTHROPIC_API_KEY=sk-ant-...
+kubectl create secret generic kubently-llm-secrets \
+  --from-literal=ANTHROPIC_API_KEY=sk-ant-your-key-here \
   --namespace kubently
 
-# Install with Helm
+# Create Redis password secret
+kubectl create secret generic kubently-redis-password \
+  --from-literal=password="$(openssl rand -base64 32)" \
+  --namespace kubently
+
+# Generate executor token
+export EXECUTOR_TOKEN=$(openssl rand -hex 32)
+
+# Install with Helm (includes API + Executor)
 helm install kubently ./deployment/helm/kubently \
   --namespace kubently \
-  --set api.existingSecret=kubently-api-keys
+  --set executor.enabled=true \
+  --set executor.clusterId=local \
+  --set executor.apiUrl=http://kubently-api:8080 \
+  --set executor.token="${EXECUTOR_TOKEN}"
 ```
 
 ## Step 2: Verify Installation

@@ -59,7 +59,7 @@ api:
   env:
     LLM_PROVIDER: "anthropic-claude" # or "openai", "google-gemini"
     LOG_LEVEL: "INFO"
-  
+
   # Reference the secret created above
   existingSecret: "kubently-api-keys"
 
@@ -71,6 +71,14 @@ redis:
 
 executor:
   enabled: true
+  # REQUIRED: Unique identifier for this cluster
+  clusterId: "my-cluster"
+  # REQUIRED: URL where executor sends command results
+  # Use internal service name for same-cluster deployment
+  apiUrl: "http://kubently-api:8080"
+  # REQUIRED: Authentication token (set via --set or existingSecret)
+  # Generate with: openssl rand -hex 32
+  token: ""  # Set via --set executor.token=<token>
   security:
     mode: "readOnly" # Options: readOnly, extendedReadOnly, fullAccess
 ```
@@ -84,10 +92,14 @@ Deploy Kubently using the Helm chart located in the repository:
 git clone https://github.com/kubently/kubently.git
 cd kubently
 
+# Generate executor token
+export EXECUTOR_TOKEN=$(openssl rand -hex 32)
+
 # Install the chart
 helm install kubently ./deployment/helm/kubently \
   --namespace kubently \
-  --values values.yaml
+  --values values.yaml \
+  --set executor.token="${EXECUTOR_TOKEN}"
 ```
 
 ### Method 2: Kubernetes Manifests (Generated)
@@ -121,20 +133,27 @@ kind create cluster --name kubently --config deployment/kind-config.yaml
 # Create namespace
 kubectl create namespace kubently
 
-# Create secrets (replace with your actual keys)
+# Create secrets (replace ANTHROPIC_API_KEY with your actual key)
 kubectl create secret generic kubently-api-keys \
   --from-literal=ANTHROPIC_API_KEY=your-key \
   --namespace kubently
 
 kubectl create secret generic kubently-redis-password \
-  --from-literal=password="local-dev-password" \
+  --from-literal=password="$(openssl rand -base64 32)" \
   --namespace kubently
 
-# Deploy using Helm (using default values is fine for local testing)
+# Generate executor token
+export EXECUTOR_TOKEN=$(openssl rand -hex 32)
+
+# Deploy using Helm with executor configuration
 helm install kubently ./deployment/helm/kubently \
   --namespace kubently \
   --set api.existingSecret=kubently-api-keys \
-  --set redis.auth.existingSecret=kubently-redis-password
+  --set redis.auth.existingSecret=kubently-redis-password \
+  --set executor.enabled=true \
+  --set executor.clusterId=kind-local \
+  --set executor.apiUrl=http://kubently-api:8080 \
+  --set executor.token="${EXECUTOR_TOKEN}"
 
 # Port-forward for local access
 kubectl port-forward -n kubently svc/kubently-api 8080:8080
@@ -214,9 +233,12 @@ The Executor runs within the cluster to execute commands. Configure these in `va
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `executor.enabled` | Enable executor deployment | `true` |
+| `executor.clusterId` | **Required**: Unique ID for the cluster | `""` |
+| `executor.apiUrl` | **Required**: URL where executor sends results (e.g., `http://kubently-api:8080`) | `""` |
+| `executor.token` | **Required**: Authentication token (generate with `openssl rand -hex 32`) | `""` |
+| `executor.existingSecret` | Reference existing secret instead of `token` | `""` |
 | `executor.security.mode` | Security level (`readOnly`, `extendedReadOnly`, `fullAccess`) | `readOnly` |
-| `executor.clusterId` | Unique ID for the cluster (defaults to namespace if empty) | `""` |
-| `executor.token` | Authentication token (optional, auto-generated/managed by secret) | `""` |
 
 ### LLM Providers
 
