@@ -22,7 +22,21 @@ The Kubently CLI provides a modern, interactive command-line interface for manag
 
 ## Installation
 
+### Install from npm (Recommended)
+
+```bash
+npm i -g @kubently/cli
+```
+
+Or use npx without installing globally:
+
+```bash
+npx @kubently/cli
+```
+
 ### Install from Source
+
+For development or the latest unreleased features:
 
 ```bash
 # Clone the kubently repository
@@ -37,12 +51,6 @@ npm run build
 
 # Create global CLI command
 npm link
-```
-
-### NPM Package (Coming Soon)
-
-```bash
-npm install -g @kubently/cli
 ```
 
 ## Quick Start

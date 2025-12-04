@@ -185,7 +185,7 @@ The Kubently CLI provides an interactive terminal interface for debugging.
 ### Install from NPM (Recommended)
 
 ```bash
-npm install -g @kubently/cli
+npm i -g @kubently/cli
 ```
 
 Or using npx (no installation required):

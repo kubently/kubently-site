@@ -67,19 +67,14 @@ kubectl port-forward -n kubently svc/kubently-api 8080:8080
 ### Install the CLI
 
 ```bash
-# Clone the repository (if you haven't already)
-git clone https://github.com/kubently/kubently.git
-cd kubently/kubently-cli/nodejs
+# Install from npm (recommended)
+npm i -g @kubently/cli
 
-# Install dependencies and build
-npm install
-npm run build
-
-# Link globally
-npm link
+# Or use npx without installing
+npx @kubently/cli --help
 ```
 
-> **Note:** An NPM package is coming soon. For now, install from source.
+> **Tip:** Using `npx @kubently/cli` lets you run the CLI without a global install - great for quick testing!
 
 ### Configure the CLI
 
