@@ -252,6 +252,45 @@ Kubently supports multiple LLM providers via the `cnoe_agent_utils` LLMFactory.
 
 You must provide at least one API key via Kubernetes Secrets.
 
+### Custom OpenAI-Compatible Endpoints
+
+When using `LLM_PROVIDER=openai`, you can configure a custom OpenAI-compatible API endpoint. This allows you to use any provider that implements the OpenAI API specification (e.g., Azure OpenAI, local LLM servers, vLLM, Ollama with OpenAI compatibility, etc.).
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OPENAI_ENDPOINT` | Custom OpenAI API endpoint URL | `https://api.openai.com/v1` |
+| `OPENAI_MODEL_NAME` | Model name to use | `gpt-4o` |
+
+**Example: Using Azure OpenAI**
+```yaml
+api:
+  env:
+    LLM_PROVIDER: "openai"
+    OPENAI_ENDPOINT: "https://your-instance.openai.azure.com/"
+    OPENAI_MODEL_NAME: "gpt-4o"
+  existingSecret: "kubently-api-keys"  # Contains OPENAI_API_KEY
+```
+
+**Example: Using a local LLM server (vLLM, Ollama OpenAI-compatible)**
+```yaml
+api:
+  env:
+    LLM_PROVIDER: "openai"
+    OPENAI_ENDPOINT: "http://localhost:8000/v1"
+    OPENAI_MODEL_NAME: "llama3"
+    OPENAI_API_KEY: "not-needed"  # Some local servers don't require a key
+```
+
+**Example: Using any OpenAI-spec compatible provider**
+```yaml
+api:
+  env:
+    LLM_PROVIDER: "openai"
+    OPENAI_ENDPOINT: "https://api.your-provider.com/v1"
+    OPENAI_MODEL_NAME: "your-model-name"
+  existingSecret: "kubently-api-keys"
+```
+
 ## Verification
 
 ### Test the Installation

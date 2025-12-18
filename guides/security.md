@@ -12,7 +12,7 @@ Security is a core principle in Kubently's design. This guide covers security be
 
 Kubently implements multiple security layers:
 
-1. **Authentication**: API keys and agent tokens
+1. **Authentication**: API keys and executor tokens
 2. **Authorization**: RBAC and command validation
 3. **Network Security**: Controlled network access
 4. **Command Security**: Read-only operations only
@@ -68,7 +68,7 @@ kubectl patch secret kubently-api-config -n kubently \
   -p='[{"op": "replace", "path": "/data/api-keys", "value": "'$(echo -n "new-key" | base64)'"}]'
 ```
 
-### Agent Token Security
+### Executor Token Security
 
 **Per-Cluster Tokens:**
 ```bash
@@ -76,32 +76,32 @@ kubectl patch secret kubently-api-config -n kubently \
 export CLUSTER_A_TOKEN=$(openssl rand -hex 32)
 export CLUSTER_B_TOKEN=$(openssl rand -hex 32)
 
-# Create agent tokens secret
+# Create executor tokens secret
 kubectl create secret generic kubently-api-config \
-  --from-literal=agent-tokens="{\"cluster-a\":\"$CLUSTER_A_TOKEN\",\"cluster-b\":\"$CLUSTER_B_TOKEN\"}" \
+  --from-literal=executor-tokens="{\"cluster-a\":\"$CLUSTER_A_TOKEN\",\"cluster-b\":\"$CLUSTER_B_TOKEN\"}" \
   -n kubently
 ```
 
 **Token Rotation:**
 ```bash
-# Update agent token in secret
-kubectl patch secret kubently-agent-token -n kubently \
+# Update executor token in secret
+kubectl patch secret kubently-executor-token -n kubently \
   --type='json' \
   -p='[{"op": "replace", "path": "/data/token", "value": "'$(echo -n "$NEW_TOKEN" | base64)'"}]'
 
-# Restart agent to pick up new token
-kubectl rollout restart deployment kubently-agent -n kubently
+# Restart executor to pick up new token
+kubectl rollout restart deployment kubently-executor -n kubently
 ```
 
 ## Kubernetes RBAC
 
-### Minimal Agent Permissions
+### Minimal Executor Permissions
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubently-agent-minimal
+  name: kubently-executor-minimal
 rules:
 # Core resources - read only
 - apiGroups: [""]
@@ -139,7 +139,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: production
-  name: kubently-agent-ns
+  name: kubently-executor-ns
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "endpoints", "events"]
@@ -151,15 +151,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: kubently-agent-ns
+  name: kubently-executor-ns
   namespace: production
 subjects:
 - kind: ServiceAccount
-  name: kubently-agent
+  name: kubently-executor
   namespace: kubently
 roleRef:
   kind: Role
-  name: kubently-agent-ns
+  name: kubently-executor-ns
   apiGroup: rbac.authorization.k8s.io
 ```
 
@@ -246,16 +246,16 @@ spec:
     - protocol: UDP
       port: 53
 ---
-# Restrict agent network access
+# Restrict executor network access
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: kubently-agent-netpol
+  name: kubently-executor-netpol
   namespace: kubently
 spec:
   podSelector:
     matchLabels:
-      app: kubently-agent
+      app: kubently-executor
   policyTypes:
   - Ingress
   - Egress
@@ -396,7 +396,7 @@ SECURITY_EVENTS = [
     "unauthorized_command_attempt", 
     "session_creation",
     "session_termination",
-    "agent_connection_failure",
+    "executor_connection_failure",
     "rate_limit_exceeded"
 ]
 
@@ -436,12 +436,12 @@ groups:
       summary: Unauthorized command attempts detected
       description: "{{ $value }} unauthorized commands in the last 5 minutes"
 
-  - alert: KubentlyAgentDisconnected
-    expr: kubently_agent_connected == 0
+  - alert: KubentlyExecutorDisconnected
+    expr: kubently_executor_connected == 0
     for: 5m
     annotations:
-      summary: Kubently agent disconnected
-      description: "Agent for cluster {{ $labels.cluster_id }} has been disconnected for 5+ minutes"
+      summary: Kubently executor disconnected
+      description: "Executor for cluster {{ $labels.cluster_id }} has been disconnected for 5+ minutes"
 ```
 {% endraw %}
 
@@ -543,7 +543,7 @@ groups:
 ### Pre-Deployment
 
 - [ ] Review and customize RBAC permissions
-- [ ] Generate strong API keys and agent tokens
+- [ ] Generate strong API keys and executor tokens
 - [ ] Configure network policies
 - [ ] Enable TLS encryption
 - [ ] Set up monitoring and alerting

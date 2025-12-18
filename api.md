@@ -219,7 +219,7 @@ List available clusters (admin only).
       "cluster_id": "production-cluster",
       "name": "Production Cluster",
       "status": "connected",
-      "agent_version": "1.0.0",
+      "executor_version": "1.0.0",
       "last_seen": "2024-01-20T10:32:00Z"
     }
   ]
@@ -235,7 +235,7 @@ Get the status of a specific cluster.
 {
   "cluster_id": "production-cluster",
   "status": "connected",
-  "agent_version": "1.0.0",
+  "executor_version": "1.0.0",
   "last_seen": "2024-01-20T10:32:00Z",
   "active_sessions": 2,
   "queue_depth": 0
@@ -302,7 +302,7 @@ All endpoints may return these common error responses:
 ```json
 {
   "error": "service_unavailable",
-  "message": "Cluster agent is not connected",
+  "message": "Cluster executor is not connected",
   "details": {
     "cluster_id": "production-cluster",
     "last_seen": "2024-01-20T09:30:00Z"

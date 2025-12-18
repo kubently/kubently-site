@@ -57,7 +57,7 @@ We welcome contributions to Kubently! This guide will help you get started with 
    # Set environment variables
    export KUBENTLY_REDIS_URL=redis://localhost:6379
    export KUBENTLY_API_KEYS=dev-key-123
-   export KUBENTLY_AGENT_TOKENS='{"local": "dev-token-456"}'
+   export KUBENTLY_EXECUTOR_TOKENS='{"local": "dev-token-456"}'
    
    # Start API in development mode
    uvicorn kubently.main:app --reload --port 8080

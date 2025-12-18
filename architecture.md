@@ -97,7 +97,7 @@ executor-results:{command_id}   # Command results
 - **Sessions**: Active debugging sessions with metadata
 - **Command Queues**: Pending commands for each cluster
 - **Results**: Command execution results and history
-- **Agent Status**: Health and connectivity information
+- **Executor Status**: Health and connectivity information
 
 **Performance Characteristics:**
 - In-memory storage for sub-millisecond access
@@ -123,7 +123,7 @@ executor-results:{command_id}   # Command results
 
 2. **Active Session**
    - Commands queued for execution
-   - Agent polls and executes commands
+   - Executor polls and executes commands
    - Results cached with TTL
    - Session activity tracked
 
@@ -131,7 +131,7 @@ executor-results:{command_id}   # Command results
    - Automatic expiration after inactivity
    - Manual session closure
    - Resource cleanup in Redis
-   - Agent notification of closure
+   - Executor notification of closure
 
 ## Security Architecture
 
@@ -157,11 +157,11 @@ executor-results:{command_id}   # Command results
 ### Command Security
 
 ```yaml
-# Example RBAC for Kubently Agent
+# Example RBAC for Kubently Executor
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubently-agent
+  name: kubently-executor
 rules:
 - apiGroups: [""]
   resources: ["pods", "nodes", "services", "endpoints", "events"]
@@ -177,7 +177,7 @@ rules:
 ### Network Security
 
 - **API Service**: Exposed via LoadBalancer or Ingress
-- **Agents**: Outbound connections only
+- **Executors**: Outbound connections only
 - **Redis**: Internal cluster communication only
 - **Optional**: Network policies for additional isolation
 
@@ -205,7 +205,7 @@ rules:
 | Component | Memory | CPU |
 |-----------|--------|-----|
 | API Service | 200-500MB | 0.5-1.0 cores |
-| Agent | 50-100MB | 0.1-0.3 cores |
+| Executor | 50-100MB | 0.1-0.3 cores |
 | Redis | 100-500MB | 0.2-0.5 cores |
 
 ## Scalability
@@ -217,10 +217,10 @@ rules:
 - Load balancer distributes requests
 - Session affinity not required
 
-**Agents:**
-- One agent per cluster (not horizontally scaled)
-- Agent restarts handled gracefully
-- No shared state between agents
+**Executors:**
+- One executor per cluster (not horizontally scaled)
+- Executor restarts handled gracefully
+- No shared state between executors
 
 **Redis:**
 - Redis Cluster for horizontal scaling
@@ -232,11 +232,11 @@ rules:
 **Memory Scaling:**
 - Redis memory scales with active sessions
 - API memory scales with concurrent requests
-- Agent memory remains constant
+- Executor memory remains constant
 
 **CPU Scaling:**
 - API CPU scales with request rate
-- Agent CPU scales with command complexity
+- Executor CPU scales with command complexity
 - Redis CPU scales with data operations
 
 ## High Availability
@@ -292,10 +292,10 @@ data:
     sentinel failover-timeout mymaster 10000
 ```
 
-### Agent HA
+### Executor HA
 
-- Agents automatically reconnect on failure
-- Command queues preserved during agent restarts
+- Executors automatically reconnect on failure
+- Command queues preserved during executor restarts
 - Health monitoring with automatic recovery
 
 ## Monitoring and Observability
@@ -308,7 +308,7 @@ data:
 - Command execution times
 - Error rates by endpoint
 
-**Agent Metrics:**
+**Executor Metrics:**
 - Command execution success/failure rates
 - Queue depth and processing time
 - Connection health to API
