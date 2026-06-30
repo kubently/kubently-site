@@ -58,6 +58,61 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
   </div>
 </div>
 
+<!-- =========================================================================
+     Task 9: Connect section — A2A + MCP protocols
+     ========================================================================= -->
+<section class="connect-section" aria-labelledby="connect-heading">
+  <div class="connect-inner">
+
+    <div class="connect-header">
+      <p class="connect-eyebrow" aria-hidden="true">CONNECT</p>
+      <h2 class="connect-h2" id="connect-heading">Speaks your agent's language</h2>
+      <p class="connect-subtitle">Plug Kubently into any AI client — two open protocols, same read-only cluster access.</p>
+    </div>
+
+    <div class="connect-grid">
+
+      <!-- Card 1: A2A Protocol -->
+      <div class="connect-card">
+        <div class="connect-card__header">
+          <h3 class="connect-card__title">A2A Protocol</h3>
+          <p class="connect-card__subtitle">Full conversational agent over <code>/a2a/</code></p>
+        </div>
+        <p class="connect-card__desc">Talk to Kubently in natural language. It plans, runs kubectl, and streams findings back over SSE.</p>
+        <pre class="connect-code" aria-label="A2A curl example"><code>curl -X POST https://kubently.io/a2a/ \
+  -H "X-API-Key: $KUBENTLY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"message/stream",
+       "params":{"message":{"messageId":"1","role":"user",
+       "parts":[{"text":"show crashing pods in prod-eu"}]}}}'</code></pre>
+      </div>
+
+      <!-- Card 2: MCP -->
+      <div class="connect-card">
+        <div class="connect-card__header">
+          <h3 class="connect-card__title">
+            MCP
+            <span class="connect-badge" aria-label="New">New</span>
+          </h3>
+          <p class="connect-card__subtitle">Tools for any MCP client over <code>/mcp</code></p>
+        </div>
+        <p class="connect-card__desc">Connect Claude Desktop, Cursor, or your own agent. Kubently exposes <code>list_clusters</code> and <code>execute_kubectl</code> as MCP tools.</p>
+        <pre class="connect-code" aria-label="MCP configuration JSON"><code>{
+  "mcpServers": {
+    "kubently": {
+      "type": "streamable-http",
+      "url": "https://kubently.io/mcp",
+      "headers": { "X-API-Key": "&lt;your-api-key&gt;" }
+    }
+  }
+}</code></pre>
+        <a class="connect-guide-link" href="https://github.com/kubently/kubently/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Read the MCP guide &rarr;</a>
+      </div>
+
+    </div><!-- /.connect-grid -->
+  </div><!-- /.connect-inner -->
+</section>
+
 <div class="wrapper">
   <div class="features">
     <div class="feature reveal">
