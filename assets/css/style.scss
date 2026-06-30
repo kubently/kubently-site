@@ -1739,3 +1739,391 @@ pre code {
   justify-content: center;
   margin-top: 0.25rem;
 }
+
+/* =========================================================================
+   Task 11: Inner page layout — page-wrapper, page-header, page-content prose
+   ========================================================================= */
+
+/* ---- Outer wrapper: full-width dark background --------------------------- */
+.page-wrapper {
+  min-height: calc(100vh - 60px); /* account for sticky header */
+  background: var(--bg);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+/* ---- Constrained reading measure ---------------------------------------- */
+.page-inner {
+  max-width: 780px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 2rem);
+}
+
+/* ---- Page header --------------------------------------------------------- */
+.page-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.15;
+  margin: 0 0 0.5rem;
+}
+
+.page-header__subtitle {
+  font-size: 1.0625rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  max-width: 65ch;
+}
+
+/* =========================================================================
+   .page-content — dark long-form markdown prose
+   ========================================================================= */
+
+/* ---- Headings ------------------------------------------------------------ */
+.page-content h1,
+.page-content h2,
+.page-content h3,
+.page-content h4,
+.page-content h5,
+.page-content h6 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 2.25em;
+  margin-bottom: 0.75em;
+}
+
+/* h1 inside content is rare (page title handles it) but style defensively */
+.page-content h1 {
+  font-size: 2rem;
+}
+
+.page-content h2 {
+  font-size: 1.5rem;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-content h3 {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.page-content h4 {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.page-content h5,
+.page-content h6 {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Paragraphs ---------------------------------------------------------- */
+.page-content p {
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-top: 0;
+  margin-bottom: 1.25em;
+}
+
+/* ---- Links --------------------------------------------------------------- */
+.page-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(45, 212, 191, 0.35);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.page-content a:hover,
+.page-content a:focus-visible {
+  color: var(--accent-2);
+  text-decoration-color: var(--accent-2);
+}
+
+/* ---- Lists --------------------------------------------------------------- */
+.page-content ul,
+.page-content ol {
+  margin-top: 0;
+  margin-bottom: 1.25em;
+  padding-left: 1.75rem;
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.page-content li {
+  margin-bottom: 0.35em;
+}
+
+.page-content li > p {
+  margin-bottom: 0.5em;
+}
+
+/* Nested list indentation */
+.page-content ul ul,
+.page-content ol ul,
+.page-content ul ol,
+.page-content ol ol {
+  margin-top: 0.35em;
+  margin-bottom: 0.35em;
+}
+
+/* Custom bullet color */
+.page-content ul li::marker {
+  color: var(--accent);
+}
+
+.page-content ol li::marker {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ---- Inline code --------------------------------------------------------- */
+.page-content :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surface-2);
+  color: var(--accent);
+  padding: 0.2em 0.45em;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* ---- Fenced code blocks -------------------------------------------------- */
+.page-content pre,
+.page-content .highlight pre,
+.page-content .highlighter-rouge pre {
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.375rem;
+  overflow-x: auto;
+  margin-bottom: 1.5em;
+  line-height: 1.7;
+  /* Ensure inner Rouge tokens inherit font correctly */
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+/* Reset the base pre/code rules inside .page-content to not fight Rouge */
+.page-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre;
+}
+
+/* Wrap highlight divs so they inherit the block styling */
+.page-content .highlight,
+.page-content .highlighter-rouge {
+  margin-bottom: 1.5em;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.page-content .highlighter-rouge .highlight {
+  /* syntax-dark.scss sets the background; ensure no double border */
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.page-content .highlighter-rouge {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ---- Tables -------------------------------------------------------------- */
+.page-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.75em;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  /* On small screens table scrolls horizontally */
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-content thead {
+  background: var(--surface);
+}
+
+.page-content th {
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border-2);
+  white-space: nowrap;
+}
+
+.page-content td {
+  color: var(--text);
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+
+/* Zebra rows */
+.page-content tbody tr:nth-child(even) {
+  background: var(--surface);
+}
+
+.page-content tbody tr:nth-child(odd) {
+  background: transparent;
+}
+
+.page-content tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* ---- Blockquotes --------------------------------------------------------- */
+.page-content blockquote {
+  margin: 0 0 1.5em;
+  padding: 0.875rem 1.25rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.page-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.page-content blockquote strong {
+  color: var(--text);
+  font-style: normal;
+}
+
+/* ---- Horizontal rules ---------------------------------------------------- */
+.page-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+
+/* ---- Images -------------------------------------------------------------- */
+.page-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: block;
+  margin-block: 1.5em;
+}
+
+/* ---- Strong / emphasis --------------------------------------------------- */
+.page-content strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.page-content em {
+  color: var(--text);
+  font-style: italic;
+}
+
+/* ---- kbd ----------------------------------------------------------------- */
+.page-content kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-2);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.15em 0.45em;
+}
+
+/* ---- Alert/callout divs used by installation.md ------------------------- */
+.page-content .alert {
+  padding: 0.875rem 1.125rem;
+  border-radius: 6px;
+  margin-bottom: 1.5em;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  border-left: 3px solid var(--border-2);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.page-content .alert-info {
+  border-left-color: var(--accent-2);
+  background: rgba(34, 211, 238, 0.06);
+}
+
+.page-content .alert-warning {
+  border-left-color: var(--warn);
+  background: rgba(227, 179, 65, 0.06);
+}
+
+.page-content .alert strong {
+  color: inherit;
+}
+
+/* ---- Architecture diagram wrapper ---------------------------------------- */
+.page-content .architecture-diagram {
+  margin-block: 1.5em;
+  text-align: center;
+}
+
+.page-content .architecture-diagram img {
+  margin-inline: auto;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+/* ---- Responsive adjustments ---------------------------------------------- */
+@media (max-width: 600px) {
+  .page-wrapper {
+    padding-block: 1.75rem;
+  }
+
+  .page-content pre,
+  .page-content .highlight pre,
+  .page-content .highlighter-rouge pre {
+    padding: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .page-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .page-content h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* ---- Reduced-motion guard ------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .page-content a {
+    transition: none;
+  }
+}
