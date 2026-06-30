@@ -174,12 +174,542 @@ pre code {
 }
 
 /* =========================================================================
-   TODO redesign: component layers below are owned by later tasks and are
-   intentionally NOT implemented in this foundation task:
-     - header / site-nav            (Task: header/footer)
-     - footer / social              (Task: header/footer)
-     - hero + live terminal         (Task: hero)
-     - feature cards / metrics      (Task: sections)
-     - inner-page typography theme  (Task: inner-page theme)
-   They will consume the :root tokens defined above.
+   Task 7: Header · Navigation · Footer — Terminal Noir components
    ========================================================================= */
+
+/* ---- Shared container --------------------------------------------------- */
+.site-header__inner,
+.site-footer__inner,
+.site-footer__bottom-inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* =========================================================================
+   SITE HEADER
+   ========================================================================= */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 12, 16, 0.85); /* --bg at 85% */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 60px;
+}
+
+/* ---- Logo + wordmark ---------------------------------------------------- */
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  text-decoration: none;
+  flex-shrink: 0;
+  color: var(--text);
+}
+
+.site-header__brand:hover {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.site-header__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border-radius: 6px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.site-header__logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.site-header__wordmark {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* =========================================================================
+   PRIMARY NAV (desktop)
+   ========================================================================= */
+.site-nav {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.site-nav__list {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.site-nav__item {
+  position: relative;
+}
+
+.site-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.site-nav__link:hover,
+.site-nav__link:focus-visible {
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.site-nav__link.is-active {
+  color: var(--accent);
+}
+
+.site-nav__chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: currentColor;
+}
+
+/* ---- Dropdown ----------------------------------------------------------- */
+.site-nav__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  list-style: none;
+  padding: 0.375rem;
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Hidden by default — shown on hover/focus-within */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+/* Show on hover over parent item */
+.site-nav__item--has-children:hover .site-nav__dropdown,
+.site-nav__item--has-children:focus-within .site-nav__dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
+}
+
+/* Rotate chevron when open */
+.site-nav__item--has-children:hover .site-nav__chevron,
+.site-nav__item--has-children:focus-within .site-nav__chevron {
+  transform: rotate(180deg);
+}
+
+.site-nav__dropdown-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 5px;
+  transition: color 0.12s ease, background 0.12s ease;
+  white-space: nowrap;
+}
+
+.site-nav__dropdown-link:hover,
+.site-nav__dropdown-link:focus-visible {
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.site-nav__dropdown-link.is-active {
+  color: var(--accent);
+}
+
+/* =========================================================================
+   HEADER ACTIONS (GitHub btn + hamburger)
+   ========================================================================= */
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ---- GitHub button ------------------------------------------------------ */
+.site-header__github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.site-header__github-btn:hover,
+.site-header__github-btn:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(45, 212, 191, 0.06);
+  text-decoration: none;
+}
+
+.site-header__github-icon {
+  flex-shrink: 0;
+}
+
+/* ---- Hamburger toggle --------------------------------------------------- */
+.nav-toggle {
+  display: none; /* shown via media query below */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.nav-toggle:hover {
+  border-color: var(--accent);
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.nav-toggle__bar {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle.is-open .nav-toggle__bar:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.nav-toggle.is-open .nav-toggle__bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.is-open .nav-toggle__bar:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* =========================================================================
+   MOBILE NAV PANEL
+   ========================================================================= */
+.mobile-nav {
+  display: none; /* controlled by media query */
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.mobile-nav.is-open {
+  max-height: 600px;
+}
+
+.mobile-nav__list {
+  list-style: none;
+  padding: 0.75rem 1.5rem 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.mobile-nav__link {
+  display: block;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 5px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.mobile-nav__link:hover,
+.mobile-nav__link:focus-visible {
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.mobile-nav__link.is-active {
+  color: var(--accent);
+}
+
+.mobile-nav__children {
+  list-style: none;
+  padding: 0.125rem 0 0.25rem 1rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  border-left: 1px solid var(--border);
+}
+
+.mobile-nav__child-link {
+  display: block;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.mobile-nav__child-link:hover,
+.mobile-nav__child-link:focus-visible {
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.mobile-nav__child-link.is-active {
+  color: var(--accent);
+}
+
+.mobile-nav__item--github {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* =========================================================================
+   RESPONSIVE BREAKPOINT — collapse to hamburger below 860px
+   ========================================================================= */
+@media (max-width: 860px) {
+  .site-nav {
+    display: none;
+  }
+
+  .site-header__github-btn span {
+    display: none; /* icon only on small screens */
+  }
+
+  .site-header__github-btn {
+    padding: 0.375rem 0.5rem;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .mobile-nav {
+    display: block;
+  }
+}
+
+/* =========================================================================
+   SITE FOOTER
+   ========================================================================= */
+.site-footer {
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.site-footer__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* ---- Footer brand col --------------------------------------------------- */
+.site-footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.site-footer__brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text);
+  align-self: flex-start;
+}
+
+.site-footer__brand-link:hover {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.site-footer__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 5px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.site-footer__logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.site-footer__wordmark {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.site-footer__tagline {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 22ch;
+}
+
+/* ---- Footer link columns ------------------------------------------------ */
+.site-footer__heading {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.875rem;
+}
+
+.site-footer__links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.site-footer__links a {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-footer__links a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ---- Footer bottom bar -------------------------------------------------- */
+.site-footer__bottom {
+  border-top: 1px solid var(--border);
+}
+
+.site-footer__bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-footer__copy,
+.site-footer__note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ---- Footer responsive -------------------------------------------------- */
+@media (max-width: 680px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .site-footer__bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+@media (min-width: 681px) and (max-width: 860px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .site-footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- Reduced-motion guard (component additions) ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__dropdown,
+  .mobile-nav,
+  .nav-toggle__bar {
+    transition: none !important;
+  }
+}

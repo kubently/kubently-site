@@ -1,5 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-  
+
+  // --- Mobile nav toggle ---
+  const navToggle = document.querySelector('.nav-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  if (navToggle && mobileNav) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', String(!isOpen));
+      navToggle.classList.toggle('is-open', !isOpen);
+      mobileNav.classList.toggle('is-open', !isOpen);
+      mobileNav.setAttribute('aria-hidden', String(isOpen));
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileNav.classList.contains('is-open')) {
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.classList.remove('is-open');
+        mobileNav.classList.remove('is-open');
+        mobileNav.setAttribute('aria-hidden', 'true');
+        navToggle.focus();
+      }
+    });
+
+    // Close when clicking outside the header
+    document.addEventListener('click', (e) => {
+      if (
+        mobileNav.classList.contains('is-open') &&
+        !e.target.closest('.site-header')
+      ) {
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.classList.remove('is-open');
+        mobileNav.classList.remove('is-open');
+        mobileNav.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
   // --- Typewriter Effect ---
   const textToType = [
     "> kubently debug",

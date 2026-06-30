@@ -1,10 +1,39 @@
-<nav class="main-nav">
-  <ul>
-    <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>🏠 Home</a></li>
-    <li><a href="{{ '/installation/' | relative_url }}" {% if page.url contains 'installation' %}class="active"{% endif %}>📦 Installation</a></li>
-    <li><a href="{{ '/guides/' | relative_url }}" {% if page.url contains 'guides' %}class="active"{% endif %}>📚 Guides</a></li>
-    <li><a href="{{ '/api/' | relative_url }}" {% if page.url contains 'api' %}class="active"{% endif %}>🔌 API Reference</a></li>
-    <li><a href="{{ '/architecture/' | relative_url }}" {% if page.url contains 'architecture' %}class="active"{% endif %}>🏗️ Architecture</a></li>
-    <li><a href="{{ '/contributing/' | relative_url }}" {% if page.url contains 'contributing' %}class="active"{% endif %}>🤝 Contributing</a></li>
-  </ul>
-</nav>
+{% comment %}
+  navigation.html — renders the primary nav list.
+  Included by header.html. Kept as a separate include for reuse.
+  The full nav (with dropdown + mobile panel) lives in header.html;
+  this file exists as a lightweight standalone reference if needed.
+{% endcomment %}
+<ul class="site-nav__list" role="list">
+  {%- for item in site.navigation -%}
+    {%- if item.children -%}
+      <li class="site-nav__item site-nav__item--has-children">
+        <a class="site-nav__link{% if page.url contains item.url %} is-active{% endif %}"
+           href="{{ item.url | relative_url }}"
+           aria-haspopup="true">
+          {{ item.title }}
+          <svg class="site-nav__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <ul class="site-nav__dropdown" role="list">
+          {%- for child in item.children -%}
+            <li>
+              <a class="site-nav__dropdown-link{% if page.url == child.url %} is-active{% endif %}"
+                 href="{{ child.url | relative_url }}">
+                {{ child.title }}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </li>
+    {%- else -%}
+      <li class="site-nav__item">
+        <a class="site-nav__link{% if page.url == item.url %} is-active{% endif %}"
+           href="{{ item.url | relative_url }}">
+          {{ item.title }}
+        </a>
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>
