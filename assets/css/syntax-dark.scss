@@ -1,0 +1,126 @@
+---
+---
+
+/*
+ * syntax-dark.scss — Terminal Noir dark Rouge syntax highlight theme
+ * Task 11: adapted from monokai.sublime base, re-keyed to the teal/noir palette.
+ *
+ * Token palette (harmonizes with --accent #2dd4bf, --accent-2 #22d3ee):
+ *   keywords      → #f92672  (pink/magenta — high contrast, distinct)
+ *   strings       → #a8ff78  (soft lime-green — readable, warm)
+ *   numbers/lit   → #ae81ff  (lavender — distinct from strings)
+ *   comments      → #6272a4  (slate blue — muted, AA-compliant on bg-deep)
+ *   functions     → #50fa7b  (green — named things)
+ *   types/classes → #2dd4bf  (teal accent — matches brand)
+ *   attributes    → #8be9fd  (cyan — XML/HTML attrs)
+ *   tags          → #f92672  (pink — HTML/YAML tags)
+ *   constants     → #bd93f9  (purple)
+ *   operators     → #f8f8f2  (near-white)
+ *   base text     → #e6edf3  (--text)
+ *   background    → #070a0e  (--bg-deep)
+ */
+
+/* ---- Code block container ------------------------------------------------ */
+.highlight,
+.highlighter-rouge .highlight {
+  background-color: #070a0e; /* --bg-deep */
+  color: #e6edf3;            /* --text */
+}
+
+/* ---- Table layout (line-number mode) ------------------------------------- */
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+
+/* ---- Base/whitespace ----------------------------------------------------- */
+.highlight .w   { color: #e6edf3; background-color: #070a0e; }
+.highlight .n   { color: #e6edf3; background-color: #070a0e; }
+.highlight .py  { color: #e6edf3; background-color: #070a0e; }
+.highlight .nx  { color: #e6edf3; background-color: #070a0e; }
+
+/* ---- Keywords ------------------------------------------------------------ */
+.highlight .k   { color: #f92672; } /* keyword */
+.highlight .kc  { color: #bd93f9; } /* keyword.constant (true/false/null) */
+.highlight .kd  { color: #f92672; } /* keyword.declaration (def/var/let) */
+.highlight .kn  { color: #f92672; } /* keyword.namespace (import) */
+.highlight .kp  { color: #f92672; } /* keyword.pseudo */
+.highlight .kr  { color: #f92672; } /* keyword.reserved */
+.highlight .kt  { color: #2dd4bf; } /* keyword.type */
+.highlight .kv  { color: #f92672; } /* keyword.variable */
+
+/* ---- Names / identifiers ------------------------------------------------- */
+.highlight .na  { color: #8be9fd; } /* name.attribute */
+.highlight .nb  { color: #f1fa8c; } /* name.builtin */
+.highlight .bp  { color: #e6edf3; background-color: #070a0e; } /* name.builtin.pseudo */
+.highlight .nc  { color: #2dd4bf; } /* name.class */
+.highlight .no  { color: #bd93f9; } /* name.constant */
+.highlight .nd  { color: #50fa7b; } /* name.decorator */
+.highlight .ne  { color: #50fa7b; } /* name.exception */
+.highlight .nf  { color: #50fa7b; } /* name.function */
+.highlight .fm  { color: #50fa7b; } /* name.function.magic */
+.highlight .ni  { color: #e6edf3; background-color: #070a0e; } /* name.entity */
+.highlight .nl  { color: #e6edf3; background-color: #070a0e; } /* name.label */
+.highlight .nn  { color: #e6edf3; background-color: #070a0e; } /* name.namespace */
+.highlight .nt  { color: #f92672; } /* name.tag (HTML/XML tags) */
+.highlight .nv  { color: #e6edf3; background-color: #070a0e; } /* name.variable */
+.highlight .vc  { color: #e6edf3; background-color: #070a0e; } /* name.variable.class */
+.highlight .vg  { color: #e6edf3; background-color: #070a0e; } /* name.variable.global */
+.highlight .vi  { color: #e6edf3; background-color: #070a0e; } /* name.variable.instance */
+.highlight .vm  { color: #e6edf3; background-color: #070a0e; } /* name.variable.magic */
+
+/* ---- Strings ------------------------------------------------------------- */
+.highlight .s   { color: #a8ff78; } /* string */
+.highlight .s1  { color: #a8ff78; } /* string.single */
+.highlight .s2  { color: #a8ff78; } /* string.double */
+.highlight .sa  { color: #a8ff78; } /* string.affix */
+.highlight .sb  { color: #a8ff78; } /* string.backtick */
+.highlight .sc  { color: #ae81ff; } /* string.char */
+.highlight .dl  { color: #a8ff78; } /* string.delimiter */
+.highlight .sd  { color: #a8ff78; } /* string.doc */
+.highlight .se  { color: #ae81ff; } /* string.escape */
+.highlight .sh  { color: #a8ff78; } /* string.heredoc */
+.highlight .si  { color: #a8ff78; } /* string.interpol */
+.highlight .sr  { color: #f6aa11; } /* string.regex */
+.highlight .ss  { color: #ae81ff; } /* string.symbol */
+.highlight .sx  { color: #a8ff78; } /* string.other */
+
+/* ---- Numbers / literals -------------------------------------------------- */
+.highlight .m   { color: #ae81ff; } /* number */
+.highlight .mb  { color: #ae81ff; } /* number.bin */
+.highlight .mf  { color: #ae81ff; } /* number.float */
+.highlight .mh  { color: #ae81ff; } /* number.hex */
+.highlight .mi  { color: #ae81ff; } /* number.integer */
+.highlight .mo  { color: #ae81ff; } /* number.oct */
+.highlight .mx  { color: #ae81ff; } /* number.other */
+.highlight .il  { color: #ae81ff; } /* number.integer.long */
+
+/* ---- Operators ----------------------------------------------------------- */
+.highlight .o   { color: #f92672; } /* operator */
+.highlight .ow  { color: #f92672; } /* operator.word (and/or/not/in) */
+.highlight .p   { color: #e6edf3; } /* punctuation */
+.highlight .pi  { color: #e6edf3; } /* punctuation.indicator */
+
+/* ---- Comments ------------------------------------------------------------ */
+.highlight .c   { color: #6272a4; font-style: italic; }  /* comment */
+.highlight .ch  { color: #6272a4; font-style: italic; }  /* comment.hashbang */
+.highlight .cd  { color: #6272a4; font-style: italic; }  /* comment.doc */
+.highlight .cm  { color: #6272a4; font-style: italic; }  /* comment.multiline */
+.highlight .cpf { color: #6272a4; font-style: italic; }  /* comment.preproc.file */
+.highlight .c1  { color: #6272a4; font-style: italic; }  /* comment.single */
+.highlight .cs  { color: #6272a4; font-style: italic; }  /* comment.special */
+.highlight .cp  { color: #8be9fd; }                      /* comment.preproc (#include) */
+
+/* ---- Generic / diff ------------------------------------------------------ */
+.highlight .g   { color: #e6edf3; }
+.highlight .gd  { color: #ff5555; background-color: #1a0a0a; } /* diff deleted */
+.highlight .ge  { color: #e6edf3; font-style: italic; }
+.highlight .gh  { color: #50fa7b; font-weight: bold; }          /* diff header */
+.highlight .gi  { color: #50fa7b; background-color: #0a1a0a; }  /* diff inserted */
+.highlight .go  { color: #8b97a5; }                             /* generic output */
+.highlight .gp  { color: #2dd4bf; }                             /* generic prompt $ */
+.highlight .gs  { font-weight: bold; }
+.highlight .gu  { color: #8b97a5; }                             /* generic subheading */
+.highlight .gr  { color: #ff5555; }                             /* generic.error */
+.highlight .gt  { color: #ff5555; }                             /* generic.traceback */
+
+/* ---- Error --------------------------------------------------------------- */
+.highlight .err { color: #ff5555; }

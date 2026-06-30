@@ -12,7 +12,9 @@ kramdown:
   syntax_highlighter_opts:
     default_lang: bash
 
-theme: minima
+# Theme removed: the site now owns its layouts/includes/styles directly
+# (Terminal Noir redesign). Do not set `theme: minima` — we no longer
+# depend on the minima gem's layouts or includes.
 
 # Modern site configuration
 author: Kubently Team
