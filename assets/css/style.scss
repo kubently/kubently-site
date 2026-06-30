@@ -2088,6 +2088,9 @@ pre code {
 }
 
 /* ---- Architecture diagram wrapper ---------------------------------------- */
+/* Light-background SVG diagrams need a framed container so they don't look  */
+/* like broken white blocks on the dark page. Scope tightly to .architecture- */
+/* diagram so other transparent/dark images are unaffected.                  */
 .page-content .architecture-diagram {
   margin-block: 1.5em;
   text-align: center;
@@ -2097,6 +2100,13 @@ pre code {
   margin-inline: auto;
   border-radius: 8px;
   max-width: 100%;
+  /* Frame light-background diagrams as deliberate figures */
+  background: #ffffff;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* Use box-shadow instead of outline so it's never clipped */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 /* ---- Responsive adjustments ---------------------------------------------- */
@@ -2124,6 +2134,154 @@ pre code {
 /* ---- Reduced-motion guard ------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   .page-content a {
+    transition: none;
+  }
+}
+
+/* =========================================================================
+   Task 12: Final polish — skip link + keyboard :focus-visible states
+   ========================================================================= */
+
+/* ---- Skip-to-content link ------------------------------------------------ */
+/* Visually hidden until focused; first focusable element in the DOM.        */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #04201c;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0 0 6px 6px;
+  text-decoration: none;
+  outline: none;
+  transition: top 0.15s ease;
+
+  &:focus-visible {
+    top: 0;
+    /* Ensure the ring is visible even over the accent background */
+    outline: 2px solid #04201c;
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Global :focus-visible ring ----------------------------------------- */
+/* Applied to all interactive elements.                                       */
+/* Use :focus-visible so mouse users never see the ring.                      */
+
+/* Base rule: outline ring for most interactive elements */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+  /* Ensure no transition hides the ring on appearance */
+  text-decoration: none;
+}
+
+/* ---- Nav links — already have border-radius; ring looks intentional ------ */
+.site-nav__link:focus-visible,
+.site-nav__dropdown-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  /* Inherit the hover bg so focus + bg cue are both present */
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+/* ---- Hamburger / mobile nav toggle --------------------------------------- */
+/* Already has border; switch to box-shadow ring so it isn't clipped by      */
+/* the sticky header's overflow context.                                      */
+.nav-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* ---- GitHub header button ------------------------------------------------ */
+/* Bordered element — ring stays visible; no overflow clip issue.             */
+.site-header__github-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(45, 212, 191, 0.06);
+  text-decoration: none;
+}
+
+/* ---- Hero CTA buttons ---------------------------------------------------- */
+.hero-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.hero-btn--primary:focus-visible {
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.25);
+}
+
+/* ---- CTA-band buttons (reuse .hero-btn — already covered above) ---------- */
+
+/* ---- Connect-card guide link --------------------------------------------- */
+.connect-guide-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+  text-decoration: underline;
+}
+
+/* ---- Mobile nav links ---------------------------------------------------- */
+.mobile-nav__link:focus-visible,
+.mobile-nav__child-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  color: var(--text);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+/* ---- Footer links -------------------------------------------------------- */
+/* Footer link items sit inside overflow:visible containers — outline is safe */
+.site-footer__brand-link:focus-visible,
+.site-footer__links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ---- Prose links on doc/inner pages -------------------------------------- */
+/* .page-content a — already has :focus-visible color swap; add ring.        */
+.page-content a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--accent-2);
+  text-decoration-color: var(--accent-2);
+}
+
+/* ---- Brand logo link (header) ------------------------------------------- */
+/* Inside .site-header which has overflow visible — outline is fine.         */
+.site-header__brand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* ---- Reduced-motion guard ------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
     transition: none;
   }
 }
