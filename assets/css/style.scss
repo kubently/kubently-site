@@ -1214,3 +1214,528 @@ pre code {
     padding: 1.5rem 1.25rem 1.25rem;
   }
 }
+
+/* =========================================================================
+   Task 10: How It Works · Features · Use Cases · CTA Band
+   ========================================================================= */
+
+/* ---- Shared section header pattern (eyebrow + h2 + subtitle) ------------ */
+/* Used by .flow-, .features-, .usecases- sections; reuses connect-section   */
+/* naming conventions so the visual language stays consistent.               */
+
+/* ---- How It Works -------------------------------------------------------- */
+.flow-section {
+  padding-block: clamp(4rem, 8vw, 6rem);
+  background: var(--bg-deep);
+}
+
+.flow-inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.flow-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.flow-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.875rem;
+}
+
+.flow-h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.flow-subtitle {
+  font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ---- Flow diagram — horizontal rail of nodes + arrows ------------------- */
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-block: 1rem;
+}
+
+/* ---- Individual node card ------------------------------------------------ */
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  min-width: 120px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flow-node:hover {
+  border-color: var(--border-2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Accent-bordered node (Kubently API) */
+.flow-node--accent {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.15), 0 4px 20px rgba(45, 212, 191, 0.1);
+}
+
+.flow-node--accent:hover {
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.3), 0 6px 24px rgba(45, 212, 191, 0.15);
+}
+
+.flow-node__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(45, 212, 191, 0.08);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.flow-node__name {
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.flow-node__sub {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ---- Arrow connector between nodes -------------------------------------- */
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 64px;
+  flex-shrink: 0;
+}
+
+.flow-arrow__svg {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* ---- Animated packet track ---------------------------------------------- */
+.flow-arrow__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+
+/* Animated dot packet — travels left to right */
+.flow-packet {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(45, 212, 191, 0.7);
+  /* Start off-screen left */
+  left: -10px;
+}
+
+@keyframes packet-travel {
+  0%   { left: -10px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: calc(100% + 10px); opacity: 0; }
+}
+
+/* Guard: only animate when motion is OK */
+@media (prefers-reduced-motion: no-preference) {
+  .flow-packet--1 { animation: packet-travel 2.4s ease-in-out infinite; animation-delay: 0s; }
+  .flow-packet--2 { animation: packet-travel 2.4s ease-in-out infinite; animation-delay: 0.6s; }
+  .flow-packet--3 { animation: packet-travel 2.4s ease-in-out infinite; animation-delay: 1.2s; }
+}
+
+/* ---- Caption under flow ------------------------------------------------- */
+.flow-caption {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ---- Flow: responsive — stack vertically on mobile ---------------------- */
+@media (max-width: 680px) {
+  .flow-diagram {
+    flex-direction: column;
+    align-items: center;
+    overflow-x: visible;
+    gap: 0;
+  }
+
+  .flow-node {
+    width: 100%;
+    max-width: 280px;
+    flex-direction: row;
+    text-align: left;
+    gap: 0.875rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .flow-node__icon {
+    flex-shrink: 0;
+  }
+
+  .flow-node__name,
+  .flow-node__sub {
+    white-space: normal;
+  }
+
+  /* Rotate arrows to point downward */
+  .flow-arrow {
+    width: auto;
+    height: 40px;
+    flex-direction: column;
+  }
+
+  .flow-arrow__svg {
+    transform: rotate(90deg);
+  }
+
+  .flow-arrow__track {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    right: auto;
+    width: 2px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .flow-packet {
+      left: 50%;
+      top: -10px;
+      transform: translateX(-50%);
+      animation: none;
+    }
+
+    .flow-packet--1,
+    .flow-packet--2,
+    .flow-packet--3 {
+      animation: packet-travel-vertical 2.4s ease-in-out infinite;
+    }
+
+    .flow-packet--1 { animation-delay: 0s; }
+    .flow-packet--2 { animation-delay: 0.6s; }
+    .flow-packet--3 { animation-delay: 1.2s; }
+  }
+}
+
+@keyframes packet-travel-vertical {
+  0%   { top: -10px; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: calc(100% + 10px); opacity: 0; }
+}
+
+/* =========================================================================
+   Task 10: Features section
+   ========================================================================= */
+.features-section {
+  padding-block: clamp(4rem, 8vw, 6rem);
+  background: var(--bg);
+}
+
+.features-inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.features-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.875rem;
+}
+
+.features-h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+/* ---- Feature cards grid: 3 → 2 → 1 columns ----------------------------- */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(45, 212, 191, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: border-color 0.2s ease;
+  }
+
+  .feature-card:hover {
+    transform: none;
+  }
+}
+
+.feature-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(45, 212, 191, 0.08);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.feature-card__title {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.feature-card__desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================================
+   Task 10: Use cases section
+   ========================================================================= */
+.usecases-section {
+  padding-block: clamp(4rem, 8vw, 6rem);
+  background: var(--bg-deep);
+}
+
+.usecases-inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.usecases-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.usecases-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.875rem;
+}
+
+.usecases-h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+/* ---- Use case cards: 3 columns → 1 on mobile --------------------------- */
+.usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.usecase-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.usecase-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(45, 212, 191, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .usecase-card {
+    transition: border-color 0.2s ease;
+  }
+
+  .usecase-card:hover {
+    transform: none;
+  }
+}
+
+.usecase-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(45, 212, 191, 0.08);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.usecase-card__title {
+  font-family: var(--font-ui);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.usecase-card__desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .usecases-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================================
+   Task 10: Final CTA band
+   ========================================================================= */
+.cta-band {
+  padding-block: clamp(4rem, 8vw, 6rem);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  /* Subtle accent tint */
+  background: linear-gradient(
+    135deg,
+    var(--surface) 0%,
+    rgba(45, 212, 191, 0.04) 100%
+  );
+}
+
+.cta-band__inner {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+}
+
+.cta-band__h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.cta-band__sub {
+  font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+.cta-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
