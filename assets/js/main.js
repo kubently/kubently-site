@@ -39,78 +39,81 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Typewriter Effect ---
-  const textToType = [
-    "> kubently debug",
-    "Waiting for connection... Connected.",
-    "AI Agent: Hello! I'm listening. What's wrong with your cluster?",
-    "> Why is the payment-service crashing?",
-    "AI Agent: Checking logs for 'payment-service' in namespace 'default'...",
-    "Found 'CrashLoopBackOff'. Recent logs indicate:",
-    "'Error: ConnectionRefused at db:5432'",
-    "It seems the database is unreachable. Should I check the DB pod status?",
-    "> Yes, please.",
-    "AI Agent: Executing 'kubectl get pods -l app=postgres'...",
-    "Pod 'postgres-0' is Pending. Reason: 'InsufficientCPU'.",
-    "Analysis: The database cannot start due to resource quotas."
+  // Each entry: { text, type }
+  // type: 'prompt' | 'info' | 'warn' | 'ok' | 'plain'
+  const sessionLines = [
+    { text: 'kubently › why are the payments pods crashing?', type: 'prompt' },
+    { text: '→ scanning cluster prod-eu … 3 clusters online', type: 'info' },
+    { text: '→ payments-7c9 in CrashLoopBackOff ×14', type: 'warn' },
+    { text: '→ readiness probe :8080 connection refused', type: 'warn' },
+    { text: '→ env DB_HOST unset since rollout #482', type: 'warn' },
+    { text: '✓ root cause: missing secret ref (payments-db)', type: 'ok' },
   ];
 
   const typewriterElement = document.getElementById('typewriter');
-  let lineIndex = 0;
-  let charIndex = 0;
-  let isDeleting = false;
-  let typingSpeed = 50;
-  let pauseBetweenLines = 800; // ms
 
-  function type() {
-    if (!typewriterElement) return;
+  // Respect prefers-reduced-motion: skip animation, show final state immediately
+  const prefersReducedMotion =
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Check if we are done with all lines
-    if (lineIndex >= textToType.length) {
-        // Optional: Reset after a long pause or just stop
-        setTimeout(() => {
+  if (typewriterElement) {
+    if (prefersReducedMotion) {
+      // Show all lines at once, static
+      let html = '';
+      sessionLines.forEach(line => {
+        html += `<div class="tw-line tw-line--${line.type}">${line.text}</div>`;
+      });
+      // Static cursor at end
+      html += '<span class="tw-cursor tw-cursor--static" aria-hidden="true"></span>';
+      typewriterElement.innerHTML = html;
+    } else {
+      // Animated typewriter — engine adapted from original
+      let lineIndex = 0;
+      let charIndex = 0;
+      const typingSpeed = 38;       // ms per character
+      const pauseBetweenLines = 700; // ms pause after line completes
+
+      function buildCompletedLines(upTo) {
+        let html = '';
+        for (let i = 0; i < upTo; i++) {
+          const l = sessionLines[i];
+          html += `<div class="tw-line tw-line--${l.type}">${l.text}</div>`;
+        }
+        return html;
+      }
+
+      function type() {
+        if (lineIndex >= sessionLines.length) {
+          // All lines done — show blinking cursor on last line and restart after pause
+          setTimeout(() => {
             typewriterElement.innerHTML = '';
             lineIndex = 0;
+            charIndex = 0;
             type();
-        }, 5000);
-        return;
-    }
+          }, 5000);
+          return;
+        }
 
-    const currentLine = textToType[lineIndex];
-    
-    // Logic to create new lines vs appending chars
-    // We'll treat the innerHTML as a list of divs
-    
-    // Get the current lines content so far
-    // But actually, we want to append line by line
-    
-    // Let's simplify: We render all previous lines fully, and the current line partially.
-    let html = '';
-    for(let i=0; i < lineIndex; i++) {
-        const lineClass = textToType[i].startsWith('>') ? 'command-line' : 'response-line';
-        html += `<div class="${lineClass}">${textToType[i]}</div>`;
-    }
-    
-    const currentClass = currentLine.startsWith('>') ? 'command-line' : 'response-line';
-    const currentText = currentLine.substring(0, charIndex + 1);
-    html += `<div class="${currentClass}">${currentText}<span class="cursor"></span></div>`;
-    
-    typewriterElement.innerHTML = html;
+        const currentLine = sessionLines[lineIndex];
+        const currentText = currentLine.text.substring(0, charIndex + 1);
 
-    charIndex++;
+        typewriterElement.innerHTML =
+          buildCompletedLines(lineIndex) +
+          `<div class="tw-line tw-line--${currentLine.type}">${currentText}<span class="tw-cursor" aria-hidden="true"></span></div>`;
 
-    if (charIndex < currentLine.length) {
-        setTimeout(type, typingSpeed);
-    } else {
-        // Line finished
-        charIndex = 0;
-        lineIndex++;
-        setTimeout(type, pauseBetweenLines);
-    }
-  }
+        charIndex++;
 
-  // Start typing if element exists
-  if (document.getElementById('typewriter')) {
+        if (charIndex < currentLine.text.length) {
+          setTimeout(type, typingSpeed);
+        } else {
+          charIndex = 0;
+          lineIndex++;
+          setTimeout(type, pauseBetweenLines);
+        }
+      }
+
       type();
+    }
   }
 
 

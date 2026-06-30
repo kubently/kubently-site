@@ -4,44 +4,57 @@ title: Kubently
 subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugging
 ---
 
-<div class="hero-container">
-  <div class="aurora-bg">
-    <div class="aurora-orb orb-1"></div>
-    <div class="aurora-orb orb-2"></div>
-    <div class="aurora-orb orb-3"></div>
-  </div>
+<div class="hero-section" aria-label="Hero">
+  <div class="hero-glow" aria-hidden="true"></div>
 
-  <div class="hero-wrapper">
-     <div class="hero-text">
-        <img src="{{ site.logo | relative_url }}" alt="Kubently Logo" class="hero-logo">
-        <h1 class="hero-title">Troubleshoot Kubernetes <span class="gradient-text">Agentically</span></h1>
-        <p class="hero-subtitle">AI-powered conversational debugging with real-time cluster insights.</p>
-        
-        <div class="badges">
-          <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache License">
-          <img src="https://img.shields.io/badge/python-3.13+-blue.svg" alt="Python 3.13+">
-          <img src="https://img.shields.io/badge/kubernetes-1.28+-326ce5.svg" alt="Kubernetes 1.28+">
-        </div>
-        
-        <div class="hero-buttons">
-          <a href="{{ '/guides/quick-start/' | relative_url }}" class="btn btn-primary">Get Started</a>
-          <a href="https://github.com/kubently/kubently" class="btn btn-secondary">GitHub</a>
-        </div>
-     </div>
+  <div class="hero-inner">
 
-     <div class="hero-terminal">
-        <div class="terminal-window">
-           <div class="terminal-header">
-              <div class="terminal-dot red"></div>
-              <div class="terminal-dot yellow"></div>
-              <div class="terminal-dot green"></div>
-              <div class="terminal-title">kubently-cli — -zsh — 80x24</div>
-           </div>
-           <div class="terminal-body">
-              <div id="typewriter" class="typewriter-content"></div>
-           </div>
+    <!-- Left column: copy -->
+    <div class="hero-copy">
+      <p class="hero-kicker" aria-label="tagline">// Kubernetes, agentically</p>
+
+      <h1 class="hero-headline">
+        Debug clusters by<br>
+        <em class="hero-headline__accent">talking to them.</em>
+      </h1>
+
+      <p class="hero-subtitle">
+        An AI agent that runs read-only kubectl across every cluster — over the
+        <strong>A2A protocol</strong> or <strong>MCP</strong> — and tells you
+        what's actually wrong.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="{{ '/guides/quick-start/' | relative_url }}" class="hero-btn hero-btn--primary">
+          Get started
+        </a>
+        <a href="https://github.com/kubently/kubently" class="hero-btn hero-btn--secondary">
+          View on GitHub
+        </a>
+      </div>
+
+      <div class="hero-badges" aria-label="Project badges">
+        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache 2.0 License">
+        <img src="https://img.shields.io/badge/python-3.13+-blue.svg" alt="Python 3.13+">
+        <img src="https://img.shields.io/badge/kubernetes-1.28+-326ce5.svg" alt="Kubernetes 1.28+">
+      </div>
+    </div>
+
+    <!-- Right column: live terminal -->
+    <div class="hero-terminal" aria-label="Live debug session demo">
+      <div class="terminal-window">
+        <div class="terminal-chrome" aria-hidden="true">
+          <span class="terminal-dot terminal-dot--red"></span>
+          <span class="terminal-dot terminal-dot--yellow"></span>
+          <span class="terminal-dot terminal-dot--green"></span>
+          <span class="terminal-chrome__title">kubently — zsh</span>
         </div>
-     </div>
+        <div class="terminal-body" role="log" aria-live="polite" aria-label="Terminal output">
+          <div id="typewriter" class="typewriter-content"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
