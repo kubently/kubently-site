@@ -9,14 +9,17 @@ Kubently provides a comprehensive REST API for debugging sessions, kubectl comma
 ## Base URLs
 
 ```
-# Main API (includes A2A endpoints)
+# Main API (includes A2A and MCP endpoints)
 http://your-kubently-api:8080
 
 # A2A Protocol Endpoints (mounted on main API port)
 http://your-kubently-api:8080/a2a
+
+# MCP Endpoint (mounted on main API port)
+http://your-kubently-api:8080/mcp
 ```
 
-**Note**: The A2A protocol endpoints are mounted on the main API service port (8080) under the `/a2a` path. This allows a single ingress/load balancer to handle both standard API calls and A2A protocol communications.
+**Note**: The A2A protocol and MCP endpoints are both mounted on the main API service port (8080), under the `/a2a` and `/mcp` paths respectively. This allows a single ingress/load balancer to handle standard API calls, A2A protocol communications, and MCP clients.
 
 ## Authentication
 
@@ -384,6 +387,43 @@ Example tool call event:
   "timestamp": "2024-01-20T10:30:45Z"
 }
 ```
+
+## MCP (Model Context Protocol)
+
+### Overview
+
+Kubently also exposes an optional **MCP server** so any MCP client — Claude Desktop, Cursor, or your own agent — can drive the same read-only, multi-cluster troubleshooting as tools. Where A2A is a full conversational agent that does the reasoning for you, MCP hands the tools to your client and lets it reason. Both share the same authentication, session, and queue infrastructure.
+
+The MCP server is served over **streamable HTTP** at `/mcp` and is auto-enabled whenever the `mcp` SDK (shipped via the `a2a` extra) is installed.
+
+### Authentication
+
+MCP requests use the same `X-API-Key` header as the REST API and A2A — a key from `API_KEYS`. Requests without a valid key receive `401 Unauthorized`.
+
+### Tools
+
+| Tool | Signature | Description |
+|------|-----------|-------------|
+| `list_clusters` | `list_clusters() -> list[str]` | Returns the IDs of clusters currently available for troubleshooting. |
+| `execute_kubectl` | `execute_kubectl(cluster_id, command, namespace="default") -> str` | Runs a read-only kubectl command and returns its output. `command` is the kubectl command without the leading `kubectl` (e.g. `get pods -o wide`). |
+
+Read-only safety is enforced downstream by the executor command whitelist and Kubernetes RBAC — the MCP layer is a transport/adapter, not a policy boundary.
+
+### Connecting a client
+
+```json
+{
+  "mcpServers": {
+    "kubently": {
+      "type": "streamable-http",
+      "url": "https://your-kubently-host/mcp",
+      "headers": { "X-API-Key": "<your-api-key>" }
+    }
+  }
+}
+```
+
+Remote-HTTP MCP config formats vary between clients and change over time — check your client's current documentation for the exact syntax.
 
 ## Usage Examples
 

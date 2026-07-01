@@ -32,6 +32,7 @@ The API service orchestrates debugging sessions and command execution across mul
 - **Horizontal Scaling**: Multiple pods with Redis pub/sub distribution
 - **SSE Endpoint**: Real-time executor streaming via Server-Sent Events
 - **A2A Support**: Full A2A protocol implementation with tool call interception
+- **MCP Support**: Optional MCP server exposing `list_clusters` and `execute_kubectl` as tools for any MCP client
 - **LLM Integration**: Multiple LLM providers supported through LLMFactory
 - **Todo Management**: Built-in todo tool for systematic troubleshooting
 - **Stateless Design**: All state in Redis for perfect scaling
@@ -43,6 +44,7 @@ The API service orchestrates debugging sessions and command execution across mul
 - `POST /executor/results` - Receive command results
 - `GET /health` - Health check
 - `/a2a/*` - A2A protocol endpoints (mounted on main port)
+- `/mcp` - MCP server over streamable HTTP (mounted on main port)
 
 **Performance:**
 - ~50ms command delivery via SSE
