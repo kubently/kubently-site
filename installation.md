@@ -20,7 +20,22 @@ This guide covers installing Kubently in various environments, from local develo
 
 ## Installation Methods
 
-### Method 1: Helm Chart (Recommended)
+### Method 1: `kubently install` (Recommended)
+
+The CLI automates the entire flow below — namespace, secrets, Helm install from
+the published chart repo, executor registration, and CLI configuration — and
+drops you into a debug chat:
+
+```bash
+npm install -g @kubently/cli
+kubently install
+```
+
+See the [Quick Start Guide](/guides/quick-start/) for flags and details. The
+methods below are for when you want manual control (production values, GitOps,
+custom secrets management).
+
+### Method 2: Helm Chart (Manual)
 
 <div class="alert alert-warning">
 ⚠️ <strong>Security Note:</strong> While TLS is supported, we strongly recommend keeping the ingress restricted to non-public IP addresses until the authentication/authorization system is more mature.
@@ -34,15 +49,19 @@ First, create the namespace and necessary secrets for LLM API keys and Redis aut
 # Create namespace
 kubectl create namespace kubently
 
-# 1. Create LLM API keys secret
+# 1. Create LLM API keys secret (name must be kubently-llm-secrets)
 # Supports any LLMFactory-compatible provider. Set at least one.
-kubectl create secret generic kubently-api-keys \
-  --from-literal=GOOGLE_API_KEY=your-google-key \
+kubectl create secret generic kubently-llm-secrets \
   --from-literal=ANTHROPIC_API_KEY=your-anthropic-key \
-  --from-literal=OPENAI_API_KEY=your-openai-key \
   --namespace kubently
 
-# 2. Create Redis password secret (Recommended)
+# 2. Create client API keys secret (authenticates CLI/agents to the API;
+#    the `keys` field holds newline-separated keys)
+kubectl create secret generic kubently-api-keys \
+  --from-literal=keys="$(openssl rand -hex 24)" \
+  --namespace kubently
+
+# 3. Create Redis password secret (Recommended)
 kubectl create secret generic kubently-redis-password \
   --from-literal=password="$(openssl rand -base64 32)" \
   --namespace kubently
@@ -85,29 +104,29 @@ executor:
 
 #### 3. Install with Helm
 
-Deploy Kubently using the Helm chart located in the repository:
+Deploy Kubently from the published chart repository:
 
 ```bash
-# Clone the repository if you haven't already
-git clone https://github.com/kubently/kubently.git
-cd kubently
+# Add the Kubently chart repo
+helm repo add kubently https://kubently.github.io/kubently
+helm repo update
 
 # Generate executor token
 export EXECUTOR_TOKEN=$(openssl rand -hex 32)
 
 # Install the chart
-helm install kubently ./deployment/helm/kubently \
+helm install kubently kubently/kubently \
   --namespace kubently \
   --values values.yaml \
   --set executor.token="${EXECUTOR_TOKEN}"
 ```
 
-### Method 2: Kubernetes Manifests (Generated)
+### Method 3: Kubernetes Manifests (Generated)
 
 If you prefer using raw Kubernetes manifests (YAML files) instead of Helm, you can generate them from the Helm chart.
 
 ```bash
-# Clone the repository
+# Clone the repository (for chart source), or use `--repo https://kubently.github.io/kubently kubently`
 git clone https://github.com/kubently/kubently.git
 cd kubently
 
@@ -122,44 +141,19 @@ kubectl create namespace kubently
 kubectl apply -f kubently-manifests.yaml
 ```
 
-### Method 3: Kind Cluster (Local Testing)
+### Method 4: Kind Cluster (Local Testing)
 
-For local development and testing, you can use Kind (Kubernetes in Docker).
+For local development and testing, use Kind (Kubernetes in Docker). The
+easiest path is the installer — it works on Kind out of the box:
 
 ```bash
-# Create a Kind cluster
-kind create cluster --name kubently --config deployment/kind-config.yaml
-
-# Create namespace
-kubectl create namespace kubently
-
-# Create secrets (replace ANTHROPIC_API_KEY with your actual key)
-kubectl create secret generic kubently-api-keys \
-  --from-literal=ANTHROPIC_API_KEY=your-key \
-  --namespace kubently
-
-kubectl create secret generic kubently-redis-password \
-  --from-literal=password="$(openssl rand -base64 32)" \
-  --namespace kubently
-
-# Generate executor token
-export EXECUTOR_TOKEN=$(openssl rand -hex 32)
-
-# Deploy using Helm with executor configuration
-helm install kubently ./deployment/helm/kubently \
-  --namespace kubently \
-  --set api.existingSecret=kubently-api-keys \
-  --set redis.auth.existingSecret=kubently-redis-password \
-  --set executor.enabled=true \
-  --set executor.clusterId=kind-local \
-  --set executor.apiUrl=http://kubently-api:8080 \
-  --set executor.token="${EXECUTOR_TOKEN}"
-
-# Port-forward for local access
-kubectl port-forward -n kubently svc/kubently-api 8080:8080
+kind create cluster --name kubently
+kubently install
 ```
 
-### Method 4: Docker Compose (Development)
+Or manually, following Method 2 with `--set executor.clusterId=kind-local`.
+
+### Method 5: Docker Compose (Development)
 
 Ideal for purely local development without a full Kubernetes cluster.
 
@@ -268,7 +262,7 @@ api:
     LLM_PROVIDER: "openai"
     OPENAI_ENDPOINT: "https://your-instance.openai.azure.com/"
     OPENAI_MODEL_NAME: "gpt-4o"
-  existingSecret: "kubently-api-keys"  # Contains OPENAI_API_KEY
+# OPENAI_API_KEY goes in the kubently-llm-secrets secret (see step 1 above)
 ```
 
 **Example: Using a local LLM server (vLLM, Ollama OpenAI-compatible)**
@@ -288,7 +282,7 @@ api:
     LLM_PROVIDER: "openai"
     OPENAI_ENDPOINT: "https://api.your-provider.com/v1"
     OPENAI_MODEL_NAME: "your-model-name"
-  existingSecret: "kubently-api-keys"
+# OPENAI_API_KEY goes in the kubently-llm-secrets secret (see step 1 above)
 ```
 
 ## Verification
