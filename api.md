@@ -392,9 +392,9 @@ Example tool call event:
 
 ### Overview
 
-Kubently also exposes an optional **MCP server** so any MCP client — Claude Desktop, Cursor, or your own agent — can drive the same read-only, multi-cluster troubleshooting as tools. Where A2A is a full conversational agent that does the reasoning for you, MCP hands the tools to your client and lets it reason. Both share the same authentication, session, and queue infrastructure.
+Kubently also exposes an optional **MCP server** so any MCP client — Claude Code, Cursor, or your own agent — gets the same read-only, multi-cluster troubleshooting as a tool. MCP mirrors the A2A surface over MCP transport: your client describes the problem, and Kubently's own agent does the investigation and returns a synthesized answer. Both share the same authentication, session, and queue infrastructure.
 
-The MCP server is served over **streamable HTTP** at `/mcp` and is auto-enabled whenever the `mcp` SDK (shipped via the `a2a` extra) is installed.
+The MCP server is served over **streamable HTTP** at `/mcp/` (trailing slash required) and is auto-enabled whenever the `mcp` SDK (shipped via the `a2a` extra) is installed. Kubently is listed in the [official MCP registry](https://registry.modelcontextprotocol.io) as `io.github.kubently/kubently`.
 
 ### Authentication
 
@@ -404,19 +404,26 @@ MCP requests use the same `X-API-Key` header as the REST API and A2A — a key f
 
 | Tool | Signature | Description |
 |------|-----------|-------------|
-| `list_clusters` | `list_clusters() -> list[str]` | Returns the IDs of clusters currently available for troubleshooting. |
-| `execute_kubectl` | `execute_kubectl(cluster_id, command, namespace="default") -> str` | Runs a read-only kubectl command and returns its output. `command` is the kubectl command without the leading `kubectl` (e.g. `get pods -o wide`). |
+| `ask_kubently` | `ask_kubently(query, cluster_id?, conversation_id?) -> {"answer", "thread_id"}` | Ask Kubently to troubleshoot a Kubernetes problem in plain language. Kubently's agent investigates (running read-only kubectl as needed) and returns a markdown answer. Pass the returned `thread_id` back as `conversation_id` to continue a thread. |
 
 Read-only safety is enforced downstream by the executor command whitelist and Kubernetes RBAC — the MCP layer is a transport/adapter, not a policy boundary.
 
 ### Connecting a client
+
+The fastest path uses the CLI's bundled stdio bridge (reads URL/key from your saved config):
+
+```bash
+claude mcp add kubently -- kubently mcp
+```
+
+Or configure a streamable-HTTP client directly:
 
 ```json
 {
   "mcpServers": {
     "kubently": {
       "type": "streamable-http",
-      "url": "https://your-kubently-host/mcp",
+      "url": "https://your-kubently-host/mcp/",
       "headers": { "X-API-Key": "<your-api-key>" }
     }
   }

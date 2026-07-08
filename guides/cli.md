@@ -85,6 +85,43 @@ kubently debug
 
 ## Commands
 
+### Installation Command
+
+#### `kubently install`
+
+Install Kubently into the current kubectl context and drop into a debug chat —
+namespace, secrets, Helm install (published chart), executor registration, and
+CLI configuration in one command.
+
+```bash
+kubently install
+```
+
+**Options:**
+- `--provider <p>` — LLM provider: `anthropic-claude` (default), `openai`, `google-gemini`
+- `--llm-api-key <key>` — LLM key (default: provider env var, else prompt)
+- `--cluster-id <id>` — logical cluster id (default: derived from kube context)
+- `--namespace <ns>` — install namespace (default: `kubently`)
+- `--chart <path>` — install from a local chart directory
+- `--yes` / `--no-chat` — non-interactive use
+
+Reruns are idempotent — existing secrets are reused.
+
+### MCP Bridge Command
+
+#### `kubently mcp`
+
+Run a local stdio↔HTTP MCP bridge to the deployed `/mcp/` endpoint, so any
+stdio MCP client can use Kubently without knowing the endpoint or key:
+
+```bash
+# Add to Claude Code
+claude mcp add kubently -- kubently mcp
+
+# Point at a different deployment
+kubently mcp --api-url https://kubently.example.com --api-key <key>
+```
+
 ### Configuration Commands
 
 #### `kubently init`

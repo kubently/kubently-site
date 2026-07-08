@@ -96,16 +96,15 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
           </h3>
           <p class="connect-card__subtitle">Tools for any MCP client over <code>/mcp</code></p>
         </div>
-        <p class="connect-card__desc">Connect Claude Desktop, Cursor, or your own agent. Kubently exposes <code>list_clusters</code> and <code>execute_kubectl</code> as MCP tools.</p>
-        <pre class="connect-code" aria-label="MCP configuration JSON"><code>{
-  "mcpServers": {
-    "kubently": {
-      "type": "streamable-http",
-      "url": "https://kubently.io/mcp",
-      "headers": { "X-API-Key": "&lt;your-api-key&gt;" }
-    }
-  }
-}</code></pre>
+        <p class="connect-card__desc">Connect Claude Code, Cursor, or your own agent. One natural-language tool — <code>ask_kubently</code> — puts Kubently's diagnosis loop behind your AI client. Listed in the <a href="https://registry.modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">official MCP registry</a>.</p>
+        <pre class="connect-code" aria-label="MCP setup commands"><code># two lines, that's it
+npm install -g @kubently/cli
+claude mcp add kubently -- kubently mcp
+
+# or connect over HTTP directly
+{ "type": "streamable-http",
+  "url": "https://&lt;your-host&gt;/mcp/",
+  "headers": { "X-API-Key": "&lt;your-api-key&gt;" } }</code></pre>
         <a class="connect-guide-link" href="https://github.com/kubently/kubently/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Read the MCP guide &rarr;</a>
       </div>
 
@@ -320,18 +319,16 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
 
     <div class="usecases-grid">
 
-      <!-- 1: Intelligent troubleshooting -->
+      <!-- 1: Proactive diagnosis -->
       <div class="usecase-card">
         <div class="usecase-card__icon" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            <line x1="11" y1="8" x2="11" y2="14"/>
-            <line x1="8" y1="11" x2="14" y2="11"/>
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
         </div>
-        <h3 class="usecase-card__title">Intelligent troubleshooting</h3>
-        <p class="usecase-card__desc">LLM-powered analysis with systematic, step-by-step investigation.</p>
+        <h3 class="usecase-card__title">Proactive diagnosis</h3>
+        <p class="usecase-card__desc">Point Alertmanager at Kubently — firing alerts arrive in Slack already diagnosed.</p>
       </div>
 
       <!-- 2: Multi-agent systems -->
@@ -371,7 +368,7 @@ subtitle: Troubleshoot Kubernetes Agentically - AI-Powered Conversational Debugg
 <section class="cta-band" aria-labelledby="cta-heading">
   <div class="cta-band__inner">
     <h2 class="cta-band__h2" id="cta-heading">Start debugging agentically</h2>
-    <p class="cta-band__sub">Get Kubently running in minutes — on any Kubernetes cluster.</p>
+    <p class="cta-band__sub">One command — <code>kubently install</code> — and you're chatting with your cluster in about a minute.</p>
     <div class="cta-band__actions">
       <a href="/guides/quick-start/" class="hero-btn hero-btn--primary">
         Get started
