@@ -4,7 +4,7 @@ title: "Kubently 2.3: one command to install, MCP everywhere, and alerts that ar
 permalink: /blog/kubently-2-3/
 ---
 
-*July 2026*
+*August 2026*
 
 Kubently's job has always been simple to say: **debug Kubernetes clusters by talking to them**. This release is about removing everything that stood between you and that conversation.
 
