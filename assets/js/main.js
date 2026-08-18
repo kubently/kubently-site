@@ -42,12 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Each entry: { text, type }
   // type: 'prompt' | 'info' | 'warn' | 'ok' | 'plain'
   const sessionLines = [
-    { text: 'kubently › why are the payments pods crashing?', type: 'prompt' },
-    { text: '→ scanning cluster prod-eu … 3 clusters online', type: 'info' },
-    { text: '→ payments-7c9 in CrashLoopBackOff ×14', type: 'warn' },
-    { text: '→ readiness probe :8080 connection refused', type: 'warn' },
-    { text: '→ env DB_HOST unset since rollout #482', type: 'warn' },
-    { text: '✓ root cause: missing secret ref (payments-db)', type: 'ok' },
+    { text: '🔔 ALERT PagerDuty: checkout-api 5xx rate high (prod-eu)', type: 'prompt' },
+    { text: '→ kubently investigating … kubectl · metrics · logs · changes', type: 'info' },
+    { text: '→ p99 latency 8.4s since 14:02 (prometheus)', type: 'warn' },
+    { text: '→ log match ×212: "pool exhausted" in checkout-api', type: 'warn' },
+    { text: '→ change: rollout #57 at 14:01 dropped DB_POOL_SIZE', type: 'warn' },
+    { text: '✓ RCA posted to #incidents — rollback or restore env var', type: 'ok' },
   ];
 
   const typewriterElement = document.getElementById('typewriter');
