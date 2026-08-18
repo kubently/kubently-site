@@ -2285,3 +2285,175 @@ textarea:focus-visible {
     transition: none;
   }
 }
+
+/* ==========================================================================
+   Cloud badge — marks Cloud-edition pages/features. Usable anywhere via
+   {% include cloud-badge.html %}.
+   ========================================================================== */
+.cloud-badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Pricing page
+   ========================================================================== */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin: 2.5rem 0 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.75rem 1.5rem;
+}
+
+.pricing-card--featured {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px rgba(45, 212, 191, 0.08);
+}
+
+.pricing-card__plan {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.pricing-card--featured .pricing-card__plan {
+  color: var(--accent);
+}
+
+.pricing-card__price {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.pricing-card__unit {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.pricing-card__tagline {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 1.1rem;
+  line-height: 1.5;
+}
+
+.pricing-features {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.pricing-features li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.pricing-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.pricing-features li.pricing-features__meta {
+  color: var(--text-muted);
+}
+
+.pricing-features li.pricing-features__meta::before {
+  content: "·";
+}
+
+.pricing-card__cta {
+  margin-top: auto;
+  text-align: center;
+}
+
+/* Self-hosted: co-equal band, not a footnote */
+.selfhost-band {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  padding: 1.75rem 1.5rem;
+  margin: 0 0 2rem;
+}
+
+@media (max-width: 700px) {
+  .selfhost-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+.selfhost-band__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+.selfhost-band__title .selfhost-band__free {
+  color: var(--accent);
+}
+
+.selfhost-band__desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.selfhost-band__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pricing-footnote {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
