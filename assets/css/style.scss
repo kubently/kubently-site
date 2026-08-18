@@ -2285,3 +2285,24 @@ textarea:focus-visible {
     transition: none;
   }
 }
+
+/* ==========================================================================
+   Cloud badge — marks Cloud-edition pages/features. Usable anywhere via
+   {% include cloud-badge.html %}.
+   ========================================================================== */
+.cloud-badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  border-radius: 4px;
+  white-space: nowrap;
+}

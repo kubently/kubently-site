@@ -4,10 +4,15 @@ title: Installation
 permalink: /installation/
 ---
 
-This guide covers installing Kubently in various environments, from local development to production clusters.
+This guide covers **self-hosted** installation of the full open-source stack
+(API + Redis + executor) in various environments, from local development to
+production clusters.
 
 <div class="alert alert-info">
-💡 <strong>Quick Start:</strong> New to Kubently? Check out our <a href="/guides/quick-start/">Quick Start Guide</a> for the fastest way to get running!
+💡 <strong>Quick Start:</strong> New to Kubently? The
+<a href="/guides/quick-start/">Self-Hosted Quick Start</a> is the fastest way
+to get running. Using <strong>Kubently Cloud</strong>? You only install the
+executor — see the <a href="/docs/cloud-quickstart/">Cloud quickstart</a>.
 </div>
 
 ## Prerequisites
@@ -284,6 +289,17 @@ api:
     OPENAI_MODEL_NAME: "your-model-name"
 # OPENAI_API_KEY goes in the kubently-llm-secrets secret (see step 1 above)
 ```
+
+### Optional Evidence Sources & Proactive Features
+
+The values above get you chat-driven diagnosis with read-only kubectl. The
+rest of the engine switches on through additional Helm values — Prometheus
+and Loki (`prometheus.url`, `loki.url`), change correlation
+(`changeCorrelation.*`), cloud telemetry via workload identity
+(`executor.cloud.*`), Alertmanager/CI-CD webhooks and Slack notifications,
+scheduled checks and fleet digests, runbooks, and propose-only GitOps
+remediation. See the [Helm chart reference](/docs/reference/helm/) for the
+full values map and the [guides](/guides/) for each feature.
 
 ## Verification
 

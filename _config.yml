@@ -1,5 +1,5 @@
 title: Kubently
-description: Troubleshoot Kubernetes agentically with AI-powered conversational debugging - Real-time cluster insights through natural language
+description: AI SRE for Kubernetes - alerts arrive in Slack already diagnosed, with metric, log, and change evidence. Managed Cloud or self-hosted Apache-2.0.
 url: "https://kubently.io"
 baseurl: ""
 logo: "/assets/images/kubently-logo-cropped.jpg"
@@ -34,34 +34,27 @@ plugins:
   - jekyll-seo-tag
 
 header_pages:
-  - installation.md
-  - guides.md
-  - api.md
-  - architecture.md
+  - docs/index.md
   - contributing.md
 
 navigation:
   - title: "Home"
     url: "/"
-  - title: "Installation"
-    url: "/installation/"
-  - title: "Guides"
-    url: "/guides/"
+  - title: "Docs"
+    url: "/docs/"
     children:
-      - title: "Quick Start"
+      - title: "Cloud Quickstart"
+        url: "/docs/cloud-quickstart/"
+      - title: "Self-Hosted Quickstart"
         url: "/guides/quick-start/"
-      - title: "CLI Guide"
-        url: "/guides/cli/"
-      - title: "Multi-Agent Systems"
-        url: "/guides/multi-agent/"
-      - title: "Security"
-        url: "/guides/security/"
-      - title: "Troubleshooting"
-        url: "/guides/troubleshooting/"
-  - title: "API Reference"
-    url: "/api/"
-  - title: "Architecture"
-    url: "/architecture/"
+      - title: "Guides"
+        url: "/guides/"
+      - title: "Reference"
+        url: "/docs/reference/"
+      - title: "Cloud"
+        url: "/cloud/"
+  - title: "Pricing"
+    url: "https://cloud.kubently.io/pricing"
   - title: "Contributing"
     url: "/contributing/"
 

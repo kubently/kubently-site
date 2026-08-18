@@ -1,0 +1,12 @@
+{% comment %}
+  guide-stub.html — standard note for guide pages whose full walkthrough is
+  still being written. Params (optional):
+    upstream — URL of the canonical upstream doc to read meanwhile
+    label    — link text for the upstream doc
+{% endcomment %}
+<div class="alert alert-info">
+  📝 <strong>This guide is being written.</strong> The outline below is
+  accurate to what the product does today{% if include.upstream %}; until the
+  full walkthrough lands, the canonical reference is
+  <a href="{{ include.upstream }}">{{ include.label | default: "the upstream documentation" }}</a>{% endif %}.
+</div>

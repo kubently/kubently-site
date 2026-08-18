@@ -6,6 +6,10 @@ permalink: /architecture/
 
 Kubently follows a modular, black-box architecture where each component exposes only its public interface while hiding implementation details. This design enables independent development, testing, and replacement of components without affecting the overall system. The system is LLM-agnostic, supporting multiple providers through the cnoe_agent_utils LLMFactory interface (currently including Google, Anthropic, and OpenAI).
 
+The same architecture serves both deployment paths: in **Kubently Cloud** the
+API/control-plane side is managed and you run only the executor; **self-hosted**
+you run everything below yourself.
+
 ## System Overview
 
 ### High-Level Architecture
@@ -62,6 +66,17 @@ SSE-connected component deployed in each target cluster for instant command exec
 - **Auto-reconnection**: Resilient connection handling
 - **Token Authentication**: Secure cluster identification
 
+**Typed Tool Envelopes:**
+
+Beyond kubectl, the executor executes typed, allowlisted tool commands over
+the same channel — Prometheus queries (`PROMETHEUS_URL`), on-cluster log
+search and Loki (`LOKI_URL`), read-only `helm history`, read-only ArgoCD sync
+queries, and cloud-telemetry operations via workload identity (EKS Pod
+Identity / IRSA, GKE Workload Identity). Two invariants hold for all of them:
+the target URL/identity is configured **locally on the executor** (the
+control plane never supplies one), and results are capped before they leave
+the executor. Unconfigured sources register no agent tool at all.
+
 **Security Modes (Configurable via Helm):**
 - `readOnly`: Safe read operations only (default)
 - `extendedReadOnly`: Includes auth/certificate operations
@@ -106,6 +121,17 @@ executor-results:{command_id}   # Command results
 - Pub/Sub for real-time notifications
 - TTL-based automatic cleanup
 - Optional persistence for durability
+
+### Proactive Operations (API-side)
+
+The API also hosts the webhook surface that drives Kubently without a human
+asking: Alertmanager diagnosis, CI/CD failure webhooks and deployment
+verification, scheduled checks, and fleet health digests — each running the
+same agent investigation loop and posting results to Slack. Supporting
+modules add operator runbook injection, incident history (searchable past
+diagnoses, namespaced per caller), and optional propose-only GitOps PR
+remediation, which runs API-side so executors never hold a Git token. See
+the [guides](/guides/) for each.
 
 ## Data Flow
 

@@ -4,7 +4,7 @@ title: API Reference
 permalink: /api/
 ---
 
-Kubently provides a comprehensive REST API for debugging sessions, kubectl command execution, and A2A (Agent-to-Agent) protocol support for multi-agent systems.
+Kubently provides a comprehensive REST API for debugging sessions, kubectl command execution, proactive-operation webhooks, and A2A (Agent-to-Agent) protocol support for multi-agent systems, plus an MCP endpoint for AI clients.
 
 ## Base URLs
 
@@ -177,6 +177,7 @@ Execute a kubectl command within a debug session. Commands are validated against
 - `explain` - Resource documentation
 - `version` - Cluster version information
 - `cluster-info` - Cluster information
+- `rollout` - Rollout inspection (restricted in code to the `history` and `status` subcommands; `restart`/`undo`/`pause`/`resume` remain blocked in every security mode)
 
 **Response**
 ```json
@@ -207,6 +208,30 @@ Retrieve the result of a previously executed command.
   "executed_at": "2024-01-20T10:32:15Z"
 }
 ```
+
+### Evidence Tool Endpoints
+
+Beyond kubectl, the API exposes typed tool endpoints that ride the same
+outbound executor channel with the same cluster validation and command
+binding. Each is available only when the corresponding source is configured
+on the executor (see the [Helm reference](/docs/reference/helm/)):
+
+- `POST /debug/prometheus` — instant and range PromQL queries
+- `POST /debug/logs/search` — multi-pod log search (runs on the executor; raw logs never transit the control plane)
+- `POST /debug/loki` — LogQL range queries
+- `POST /debug/helm` — read-only Helm release history
+- `POST /debug/argocd` — read-only ArgoCD application/sync queries
+- `POST /cloud/execute` — allowlisted cloud-telemetry operations via workload identity
+
+### Webhooks (Proactive Operations)
+
+Webhook endpoints accept `X-API-Key` (or Bearer) auth and post their results
+to Slack:
+
+- `POST /webhooks/alertmanager` — Alertmanager receiver; each firing alert is investigated and the diagnosis posted. See the [alerts guide](/guides/alerts/).
+- `POST /webhooks/verify-deployment` — `{cluster, namespace, workload}`: watches the rollout settle, runs a post-deploy investigation, posts a PASS/FAIL verdict with evidence. `dry_run: true` returns the verdict synchronously without posting. See the [CI/CD guide](/guides/cicd/).
+- `POST /webhooks/scheduled-check` — `{"check": name}`: runs a named check from the checks file; PASS is silent unless configured otherwise. See [scheduled checks](/guides/scheduled-checks/).
+- `POST /webhooks/fleet-report` — sweeps every registered cluster and posts one fleet health digest; supports `dry_run` and a per-request `query`.
 
 ### Cluster Management
 
