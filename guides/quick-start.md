@@ -1,10 +1,19 @@
 ---
 layout: page
-title: Quick Start Guide
+title: Self-Hosted Quick Start
+subtitle: The full open-source stack in your own cluster — one command.
 permalink: /guides/quick-start/
 ---
 
-Get from an empty cluster to a working AI debug chat in about a minute.
+Get from an empty cluster to a working AI debug chat in about a minute, with
+everything running in your cluster under your control (Apache-2.0).
+
+<div class="alert alert-info">
+☁️ Don't want to run the control plane yourself? The
+<a href="/docs/cloud-quickstart/">Cloud quickstart</a> gets you the same
+engine with a managed control plane and a free tier — you install only the
+outbound-only executor.
+</div>
 
 ## Prerequisites
 
@@ -67,6 +76,18 @@ Cursor and generic client config.
 The installer is just automation over the standard Helm flow. For manual
 installation, production values, TLS, and multi-cluster executor setup, see the
 [Installation Guide](/installation/).
+
+## Turn on the good stuff
+
+The install above gives you chat-driven diagnosis with read-only kubectl.
+Most of Kubently's value comes from wiring in more evidence and letting it
+work proactively — each is one or two Helm values:
+
+- **[Metrics & logs](/guides/observability/)** — `prometheus.url`, `loki.url`
+- **[Change correlation](/guides/change-correlation/)** — Helm + ArgoCD history
+- **[Alert-triggered diagnosis](/guides/alerts/)** — Alertmanager → diagnosed RCA in Slack
+- **[CI/CD verification](/guides/cicd/)** and **[scheduled checks](/guides/scheduled-checks/)**
+- **[Cloud telemetry](/guides/cloud-telemetry/)** — workload identity, zero stored credentials
 
 ## Next Steps
 
