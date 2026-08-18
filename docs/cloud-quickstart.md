@@ -63,5 +63,5 @@ then answers with a root cause and the evidence trail.
 ## Next steps
 
 - [Organizations & roles](/cloud/organizations/) — invite your team.
-- [Billing & plans](/cloud/billing/) — what's in each plan; see also [pricing](/pricing/).
+- [Billing & plans](/cloud/billing/) — what's in each plan; see also [pricing](https://cloud.kubently.io/pricing).
 - [Guides](/guides/) — everything the agent can do.

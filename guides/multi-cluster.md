@@ -16,7 +16,7 @@ noisy cluster can't drown the rest. An unreachable cluster is reported as
 **unreachable — health unknown**, never as healthy.
 
 In **Kubently Cloud** {% include cloud-badge.html %}, multi-cluster fleets
-are a [Team-plan](/pricing/) feature: install the executor Helm chart into
+are a [Team-plan](https://cloud.kubently.io/pricing) feature: install the executor Helm chart into
 each cluster with your tenant token. Self-hosted, register as many executors
 as you like against your own API.
 

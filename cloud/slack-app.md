@@ -17,7 +17,7 @@ conversation in your incident channel — not just a notification.
 - **Ask cold, too.** Mention the bot with a fresh question and it starts a
   new investigation against your connected clusters.
 
-The managed Slack app is a [Team-plan](/pricing/) feature. Self-hosted
+The managed Slack app is a [Team-plan](https://cloud.kubently.io/pricing) feature. Self-hosted
 deployments get one-way Slack notifications via an incoming webhook
 (`SLACK_WEBHOOK_URL`) for alerts, verifications, digests, and scheduled
 checks — see the [alerts guide](/guides/alerts/).

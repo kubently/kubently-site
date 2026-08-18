@@ -13,7 +13,7 @@ apply only to the managed service carry a {% include cloud-badge.html %} badge.
 ## Getting started
 
 - **[Cloud quickstart](/docs/cloud-quickstart/)** {% include cloud-badge.html %} — sign up free, install the outbound-only executor, chat with your cluster in minutes.
-- **[Self-hosted quickstart](/guides/quick-start/)** — one command (`kubently install`) deploys the full open-source stack in your own cluster.
+- **[Self-hosted quickstart](/guides/quick-start/)** — one command (`kubently install`) deploys the full open-source stack in your own cluster. Apache-2.0 and free forever, with the engine's full capability.
 - **[Installation](/installation/)** — self-hosted installation in depth: Helm values, manifests, secrets, production setups.
 
 ## Guides

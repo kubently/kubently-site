@@ -6,7 +6,10 @@ permalink: /guides/quick-start/
 ---
 
 Get from an empty cluster to a working AI debug chat in about a minute, with
-everything running in your cluster under your control (Apache-2.0).
+everything running in your cluster under your control. Self-hosted Kubently
+is the full engine under Apache-2.0 — **free forever**, every capability, no
+feature gates. It is a first-class way to run Kubently, not a demo of the
+paid one.
 
 <div class="alert alert-info">
 ☁️ Don't want to run the control plane yourself? The

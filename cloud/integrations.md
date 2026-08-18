@@ -13,7 +13,7 @@ Kubently needing product-specific connectors.
 
 - **Managed per-tenant OAuth.** In Kubently Cloud you connect a provider
   from the dashboard; the OAuth grant is stored per tenant and scoped to
-  your org. A [Team-plan](/pricing/) feature.
+  your org. A [Team-plan](https://cloud.kubently.io/pricing) feature.
 - **Read-scoped by policy.** Connect read-scoped servers; tool
   descriptions and results from third-party servers are treated as untrusted
   input by the engine (sanitized, marked, size-capped).

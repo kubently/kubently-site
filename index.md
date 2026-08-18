@@ -377,7 +377,7 @@ helm install kubently-executor kubently/executor \
           <h3 class="connect-card__title">Self-hosted</h3>
           <p class="connect-card__subtitle">Apache-2.0 · full engine · always free</p>
         </div>
-        <p class="connect-card__desc">Run the whole thing in your own cluster — every evidence toolset, every webhook, your own LLM keys. Static config instead of managed auth. No feature gates, no time bombs.</p>
+        <p class="connect-card__desc">Run the whole thing in your own cluster — every evidence toolset, every webhook, your own LLM keys. Static config instead of managed auth. Free forever: not a trial, not a teaser tier, and it will not be walked back.</p>
         <pre class="connect-code" aria-label="Self-hosted install"><code>npm install -g @kubently/cli
 kubently install   # Helm + secrets + chat, one command</code></pre>
         <a class="connect-guide-link" href="{{ '/guides/quick-start/' | relative_url }}">Self-hosted quickstart &rarr;</a>
@@ -385,7 +385,7 @@ kubently install   # Helm + secrets + chat, one command</code></pre>
 
     </div><!-- /.connect-grid -->
 
-    <p class="flow-caption"><a href="{{ '/pricing/' | relative_url }}">Compare plans on the pricing page &rarr;</a></p>
+    <p class="flow-caption">Free for one cluster &middot; Team $49/cluster/month &middot; self-hosting the open-source core is <strong>free forever</strong> — <a href="https://cloud.kubently.io/pricing">full pricing &rarr;</a></p>
 
   </div><!-- /.connect-inner -->
 </section>

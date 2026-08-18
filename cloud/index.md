@@ -18,7 +18,7 @@ cloud credentials.
 ## Start here
 
 - **[Cloud quickstart](/docs/cloud-quickstart/)** — signup to first diagnosis in minutes.
-- **[Pricing](/pricing/)** — Free, Team, and Enterprise plans.
+- **[Pricing](https://cloud.kubently.io/pricing)** — Free, Team, and Enterprise plans.
 
 ## Cloud docs
 
@@ -37,7 +37,7 @@ cloud credentials.
 | Slack | Managed two-way Slack app | Incoming-webhook notifications |
 | External MCP integrations | Managed per-tenant OAuth | Static config in Helm values |
 | LLM keys | Included; BYOK on Team | Bring your own |
-| Price | [Free tier + paid plans](/pricing/) | Free, always |
+| Price | [Free tier + paid plans](https://cloud.kubently.io/pricing) | Free, always |
 
 Both paths are first-class and stay that way — Cloud is where we run the
 undifferentiated plumbing for you, not where features go to be paywalled.

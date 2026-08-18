@@ -11,14 +11,14 @@ Slack app installation, and the plan.
 
 - **Personal → org.** Signing up gives you a personal workspace; creating an
   organization lets you invite teammates and share clusters and history.
-  Organizations and roles are a [Team-plan](/pricing/) feature.
+  Organizations and roles are a [Team-plan](https://cloud.kubently.io/pricing) feature.
 - **Roles.** Members are assigned roles that control who can administer the
   org (billing, membership, integrations) versus use it (run diagnoses, read
   incident history).
 - **Multi-cluster fleets.** Clusters registered to the org are visible
   org-wide, and fleet questions fan out across all of them.
 - **Enterprise.** SSO/SAML and self-hosted/air-gapped support are available
-  on the [Enterprise plan](/pricing/).
+  on the [Enterprise plan](https://cloud.kubently.io/pricing).
 
 <div class="alert alert-info">
 📝 A full walkthrough of org administration (inviting members, role
