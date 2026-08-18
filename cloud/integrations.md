@@ -28,13 +28,22 @@ configuration — `mcpServers` in Helm values (bearer tokens referenced from
 secrets), or `KUBENTLY_MCP_SERVERS` directly. See the upstream
 [MCP client tools doc](https://github.com/kubently/kubently/blob/main/docs/MCP_CLIENT_TOOLS.md).
 
+```bash
+kubectl create secret generic kubently-grafana-mcp \
+  --from-literal=token="glsa_..." -n kubently
+```
+
 ```yaml
-# Helm values (self-hosted)
+# Helm values (self-hosted) — the token stays in the secret
 mcpServers:
   - name: grafana
-    url: https://mcp.grafana.example.com/mcp
-    bearer_token_env: GRAFANA_MCP_TOKEN
+    url: https://mcp.grafana.com/mcp
+    existingSecret: kubently-grafana-mcp
+    secretKey: token
 ```
+
+Full walkthrough, including the untrusted-input handling and the
+per-invocation injection seam: [A2A & MCP interop](/guides/a2a-integration/).
 
 <div class="alert alert-info">
 📝 Per-provider connection walkthroughs (Grafana Cloud, Datadog) are being

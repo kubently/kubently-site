@@ -6,9 +6,8 @@ permalink: /guides/
 ---
 
 Guides apply to both Kubently Cloud and self-hosted deployments unless marked
-with a {% include cloud-badge.html %} badge. Guides marked *(in progress)*
-have an accurate outline and upstream links today, with the full walkthrough
-on its way.
+with a {% include cloud-badge.html %} badge. Each one leads with the outcome,
+then prerequisites, copy-paste steps, verification, and troubleshooting.
 
 ## Getting started
 
@@ -19,27 +18,27 @@ on its way.
 
 ## Proactive operations
 
-- **[Alert-triggered diagnosis](/guides/alerts/)** *(in progress)* — Alertmanager → diagnosed RCA in Slack.
-- **[CI/CD integration](/guides/cicd/)** *(in progress)* — GitHub Actions / GitLab failure webhooks and deployment verification.
-- **[Scheduled checks & fleet digests](/guides/scheduled-checks/)** *(in progress)* — cron-scheduled investigations; quiet when healthy.
+- **[Alert-triggered diagnosis](/guides/alerts/)** — Alertmanager → diagnosed RCA in Slack.
+- **[CI/CD integration](/guides/cicd/)** — deployment verification from GitHub Actions and GitLab CI.
+- **[Proactive checks](/guides/scheduled-checks/)** — cron-scheduled investigations and fleet digests; quiet when healthy.
 
 ## Evidence sources
 
-- **[Metrics & logs](/guides/observability/)** *(in progress)* — Prometheus, multi-pod log search, and Loki.
-- **[Change correlation](/guides/change-correlation/)** *(in progress)* — rollout, Helm, ArgoCD, and event timelines.
-- **[Cloud telemetry](/guides/cloud-telemetry/)** *(in progress)* — CloudWatch / Cloud Logging via workload identity, zero stored credentials.
+- **[Metrics & logs](/guides/observability/)** — Prometheus, multi-pod log search, and Loki.
+- **[Change correlation](/guides/change-correlation/)** — rollout, Helm, ArgoCD, and event timelines.
+- **[Cloud telemetry](/guides/cloud-telemetry/)** — CloudWatch / Cloud Logging via workload identity; zero stored credentials.
 
 ## Knowledge & follow-through
 
-- **[Operator runbooks](/guides/runbooks/)** *(in progress)* — your tribal knowledge, injected into investigations.
-- **[Incident history & postmortems](/guides/incidents/)** *(in progress)* — searchable past diagnoses and postmortem export.
-- **[GitOps remediation](/guides/gitops-remediation/)** *(in progress)* — propose-only PRs against your manifests repo.
+- **[Operator runbooks](/guides/runbooks/)** — your tribal knowledge, injected into investigations.
+- **[Incident history & postmortems](/guides/incidents/)** — searchable past diagnoses and postmortem export.
+- **[GitOps remediation](/guides/gitops-remediation/)** — propose-only PRs against your manifests repo.
 
 ## Fleet & interop
 
-- **[Multi-cluster fleets](/guides/multi-cluster/)** *(in progress)* — registering executors across clusters; fleet fan-out questions.
+- **[Multi-cluster fleets](/guides/multi-cluster/)** — registering executors across clusters; fleet fan-out questions.
 - **[Multi-agent systems](/guides/multi-agent/)** — Kubently inside larger agent systems.
-- **[A2A integration](/guides/a2a-integration/)** — the agent-to-agent protocol surface.
+- **[A2A & MCP interop](/guides/a2a-integration/)** — Kubently as a sub-agent, and external MCP servers as evidence.
 
 ## Operations & safety
 

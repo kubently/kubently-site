@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Incident History & Postmortems
-subtitle: "Have we seen this before?" gets a real answer.
+subtitle: '"Have we seen this before?" gets a real answer.'
 permalink: /guides/incidents/
 ---
 

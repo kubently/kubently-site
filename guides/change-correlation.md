@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Change Correlation
-subtitle: "What changed before this broke?" — answered from the record.
+subtitle: 'What changed before this broke? — answered from the record.'
 permalink: /guides/change-correlation/
 ---
 
