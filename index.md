@@ -248,7 +248,7 @@ subtitle: AI SRE for Kubernetes — alerts in, diagnosed root causes out
           </svg>
         </div>
         <h3 class="feature-card__title">CI/CD verification</h3>
-        <p class="feature-card__desc">GitHub Actions and GitLab failure webhooks, plus post-deploy verification with a PASS/FAIL verdict and evidence.</p>
+        <p class="feature-card__desc">Post-deploy verification from GitHub Actions or GitLab CI — a PASS/FAIL verdict with evidence, or label a workload and skip CI entirely.</p>
       </div>
 
       <!-- 4: Scheduled checks -->

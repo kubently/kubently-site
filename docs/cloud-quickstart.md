@@ -56,7 +56,7 @@ then answers with a root cause and the evidence trail.
 
 - **[Slack app](/cloud/slack-app/)** — two-way conversations in the channel where incidents already happen. *(Team plan)*
 - **[Alert-triggered diagnosis](/guides/alerts/)** — point Alertmanager at your tenant's webhook; alerts arrive pre-diagnosed.
-- **[CI/CD verification](/guides/cicd/)** — GitHub Actions / GitLab failure webhooks and post-deploy verification.
+- **[CI/CD verification](/guides/cicd/)** — post-deploy verification from GitHub Actions or GitLab CI, with a PASS/FAIL verdict and evidence.
 - **[Cloud telemetry](/guides/cloud-telemetry/)** — give the executor a read-only cloud role via EKS Pod Identity / IRSA or GKE Workload Identity. Zero stored credentials.
 - **[BYO-MCP integrations](/cloud/integrations/)** — connect your Grafana Cloud or Datadog MCP servers as evidence sources. *(Team plan)*
 

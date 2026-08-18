@@ -125,8 +125,8 @@ executor-results:{command_id}   # Command results
 ### Proactive Operations (API-side)
 
 The API also hosts the webhook surface that drives Kubently without a human
-asking: Alertmanager diagnosis, CI/CD failure webhooks and deployment
-verification, scheduled checks, and fleet health digests — each running the
+asking: Alertmanager diagnosis, deployment verification (triggered from CI
+or by a workload label), scheduled checks, and fleet health digests — each running the
 same agent investigation loop and posting results to Slack. Supporting
 modules add operator runbook injection, incident history (searchable past
 diagnoses, namespaced per caller), and optional propose-only GitOps PR
