@@ -23,11 +23,21 @@ The dashboard gives you a copy-paste Helm command that installs the Kubently
 
 ```bash
 helm repo add kubently https://kubently.github.io/kubently
-helm repo update
-helm install kubently-executor kubently/executor \
-  --namespace kubently --create-namespace \
-  --set token=<your-tenant-token>
+helm install kubently-agent kubently/kubently \
+  --namespace kubently-system \
+  --create-namespace \
+  --set api.enabled=false \
+  --set redis.enabled=false \
+  --set executor.enabled=true \
+  --set executor.clusterId=<CLUSTER_ID> \
+  --set executor.token=<TOKEN> \
+  --set executor.apiUrl=<API_URL>
 ```
+
+It is **one chart** — `kubently/kubently` — with the API and Redis
+subcomponents switched off. "Install just the executor" means exactly that;
+there is no separate executor chart. (Self-hosted installs the same chart
+with `api.enabled=true` and `redis.enabled=true`.)
 
 A few things worth knowing about what you just installed:
 
@@ -55,8 +65,8 @@ then answers with a root cause and the evidence trail.
 ## 4. Wire in your workflow (optional, recommended)
 
 - **[Slack app](/cloud/slack-app/)** — two-way conversations in the channel where incidents already happen. *(Team plan)*
-- **[Alert-triggered diagnosis](/guides/alerts/)** — point Alertmanager at your tenant's webhook; alerts arrive pre-diagnosed.
-- **[CI/CD verification](/guides/cicd/)** — post-deploy verification from GitHub Actions or GitLab CI, with a PASS/FAIL verdict and evidence.
+- **[Alert-triggered diagnosis](/guides/alerts/)** — point Alertmanager at your tenant's hook URL (no auth headers needed); alerts arrive pre-diagnosed.
+- **[CI/CD integration](/guides/cicd/)** — point your Git host at your tenant's CI/CD hook: failed pipelines get diagnosed, successful deploys get verified.
 - **[Cloud telemetry](/guides/cloud-telemetry/)** — give the executor a read-only cloud role via EKS Pod Identity / IRSA or GKE Workload Identity. Zero stored credentials.
 - **[BYO-MCP integrations](/cloud/integrations/)** — connect your Grafana Cloud or Datadog MCP servers as evidence sources. *(Team plan)*
 

@@ -24,14 +24,24 @@ tenant token:
 
 ```bash
 helm repo add kubently https://kubently.github.io/kubently
-helm repo update
-helm install kubently-executor kubently/executor \
-  --namespace kubently --create-namespace \
-  --set token=<your-tenant-token>
+helm install kubently-agent kubently/kubently \
+  --namespace kubently-system \
+  --create-namespace \
+  --set api.enabled=false \
+  --set redis.enabled=false \
+  --set executor.enabled=true \
+  --set executor.clusterId=<CLUSTER_ID> \
+  --set executor.token=<TOKEN> \
+  --set executor.apiUrl=<API_URL>
 ```
 
+It is **one chart** — `kubently/kubently` — with the API and Redis
+subcomponents switched off. "Install just the executor" means exactly that;
+there is no separate executor chart. (Self-hosted installs the same chart
+with `api.enabled=true` and `redis.enabled=true`.)
+
 The cluster appears in your dashboard when the executor connects. Repeat per
-cluster. Multi-cluster fleets are a
+cluster, with a distinct `<CLUSTER_ID>` each time. Multi-cluster fleets are a
 [Team-plan](https://cloud.kubently.io/pricing) feature; see the
 [Cloud quickstart](/docs/cloud-quickstart/).
 

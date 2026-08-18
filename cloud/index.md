@@ -35,6 +35,8 @@ cloud credentials.
 | Control plane | Managed | You run it |
 | Auth | Managed accounts (Google/GitHub/email), org roles; SSO/SAML on Enterprise | Static API keys, optional OAuth/OIDC |
 | Slack | Managed two-way Slack app | Incoming-webhook notifications |
+| Alertmanager & CI/CD | Per-tenant capability hooks (no auth headers to manage) | API-key-authenticated webhook endpoints |
+| Postmortem export | `POST /postmortem`, dashboard action, `@kubently postmortem` in Slack | Ask the agent in-thread |
 | External MCP integrations | Managed per-tenant OAuth | Static config in Helm values |
 | LLM keys | Included; BYOK on Team | Bring your own |
 | Price | [Free tier + paid plans](https://cloud.kubently.io/pricing) | Free, always |

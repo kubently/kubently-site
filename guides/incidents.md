@@ -107,35 +107,63 @@ use it, since it won't exist next time.
 **An empty query lists the most recent incidents**, newest first. That's the
 "what happened last week?" query.
 
-## Postmortems
+## Postmortems {% include cloud-badge.html %}
 
 A concluded investigation already contains what a postmortem draft needs: the
 timeline, the evidence trail, the root cause, and the resolution where one was
-stated.
+stated. **Kubently Cloud** turns that into a markdown document three ways —
+all the same generation underneath.
 
-In **Kubently Cloud** {% include cloud-badge.html %}, that material is
-exportable as a postmortem draft — from the incident view in the dashboard at
-[cloud.kubently.io](https://cloud.kubently.io), and from Slack by asking the
-[Kubently Slack app](/cloud/slack-app/) in the incident thread:
+### From the API
+
+```bash
+curl -X POST https://<cloud-host>/postmortem \
+  -H "X-API-Key: $KUBENTLY_API_KEY" -H 'Content-Type: application/json' \
+  -d '{"context_id": "<conversation id>"}'
+```
+
+`context_id` is the conversation the investigation happened in. The response
+is the postmortem markdown, ready to paste into your incident tracker or
+commit to a repo.
+
+### From the dashboard
+
+Open the conversation at [cloud.kubently.io](https://cloud.kubently.io) and
+use **Generate postmortem** in the conversation view. It offers the document
+as a `.md` download and as copy-to-clipboard.
+
+### From Slack
+
+Reply in a thread the [Kubently bot](/cloud/slack-app/) started:
 
 ```
 @kubently postmortem
 ```
 
-Because the export draws on the thread's investigation, ask it **in the
-thread** where the diagnosis happened — a cold mention starts a new
-investigation instead.
+It also understands *generate postmortem*, *export postmortem*, *write
+postmortem*, and the hyphenated spellings. The Slack path bridges to
+`POST /postmortem` internally, so all three routes produce the same document.
+
+**Ask it in the thread where the diagnosis happened** — the export is scoped
+to that conversation. A cold mention starts a new investigation instead.
+
+### What to know before you wire it into a workflow
+
+- **Each generation meters as one diagnosis unit.** Regenerating a postmortem
+  costs the same as running an investigation, so generate once and edit the
+  markdown rather than re-rolling for wording.
+- **Cross-tenant access is denied.** A postmortem can only be generated from a
+  conversation owned by the caller's tenant — the same boundary incident
+  records live behind.
 
 <div class="alert alert-info">
-📝 <strong>Self-hosted:</strong> postmortem export is a Cloud dashboard and
-Slack-app surface; it is not part of the open-source engine's API today, and
-no <code>postmortem</code> endpoint or CLI flag exists in the
-<a href="https://github.com/kubently/kubently">engine repo</a>. Self-hosted
-deployments get the same underlying material by asking the agent in a
-conversation thread — <em>"write up what we found as a postmortem: timeline,
-root cause, evidence, resolution"</em> — and by pulling the incident record
-with <code>search_past_incidents</code>. If a documented export endpoint
-lands upstream, this section will point at it.
+📝 <strong>Self-hosted:</strong> postmortem export is a Cloud surface. There
+is no <code>/postmortem</code> endpoint in the
+<a href="https://github.com/kubently/kubently">open-source engine</a>.
+Self-hosted deployments get the same underlying material by asking the agent
+in the conversation thread — <em>"write up what we found as a postmortem:
+timeline, root cause, evidence, resolution"</em> — and by pulling the
+incident record with <code>search_past_incidents</code>.
 </div>
 
 ## Retention and tuning

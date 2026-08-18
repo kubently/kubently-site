@@ -65,6 +65,32 @@ create or rotate.
 
 ## 2. The Alertmanager receiver
 
+### Cloud — a per-tenant hook, no auth headers {% include cloud-badge.html %}
+
+Kubently Cloud gives you an **unguessable per-tenant hook URL** —
+`https://<cloud-host>/hooks/alertmanager/{hook_id}` — from your dashboard.
+The capability URL *is* the credential, the same model as a Slack incoming
+webhook, so Alertmanager needs no custom auth headers at all:
+
+```yaml
+# alertmanager.yml
+receivers:
+  - name: kubently
+    webhook_configs:
+      - url: https://<cloud-host>/hooks/alertmanager/<hook-id>
+```
+
+It accepts the standard Alertmanager webhook receiver payload — nothing
+special to configure on the Prometheus side.
+
+<div class="alert alert-warning">
+🔑 <strong>Treat the hook URL as a secret.</strong> Anyone holding it can
+trigger diagnoses against your tenant. Keep it in your Alertmanager secret,
+not in a config repo, and rotate it from the dashboard if it leaks.
+</div>
+
+### Self-hosted — the endpoint plus an API key
+
 ```yaml
 # alertmanager.yml
 receivers:
@@ -77,13 +103,7 @@ receivers:
               secrets: ["<your-api-key>"]
 ```
 
-<div class="alert alert-info">
-☁️ <strong>Cloud:</strong> {% include cloud-badge.html %} use your tenant's
-webhook URL and API key from the dashboard in place of
-<code>&lt;your-kubently-host&gt;</code> and
-<code>&lt;your-api-key&gt;</code>. The receiver shape, the payload, and
-everything below about grouping are identical — it is the same engine.
-</div>
+### Routing (both paths)
 
 Route to it like any other receiver:
 
@@ -102,27 +122,23 @@ route:
 
 Reload Alertmanager, and test with a real firing alert (or `amtool alert add`).
 
-### Older Alertmanager
+### Older Alertmanager (self-hosted)
 
 `http_headers` landed in Alertmanager 0.28. On older versions, put the key in
 front of Kubently instead of in the receiver — an ingress annotation, a
 sidecar, or a small proxy that adds `X-API-Key` — rather than exposing the
-endpoint unauthenticated.
+endpoint unauthenticated. Cloud is unaffected: the hook URL carries the
+authority, so there is no header to add.
 
 ## 3. What Kubently does with the payload
 
-Knowing the exact behavior is what lets you tune it:
+Knowing the exact behavior is what lets you tune it.
+
+**Both paths:**
 
 - **Only `firing` alerts are diagnosed.** Resolved alerts in the same payload
   are ignored.
-- **At most 3 alerts per payload get diagnosed** (`MAX_ALERTS_PER_PAYLOAD`).
-  If a payload carries more, the first 3 are investigated and the API logs a
-  warning naming the count. This is the single most important fact for
-  tuning your routing.
-- **The endpoint ACKs `202` immediately** with `{"accepted": <n>}`;
-  diagnosis runs in the background because it takes minutes.
-- **Each alert becomes its own investigation.** The question is built from
-  the alert's labels and annotations:
+- **The question is built from the alert's labels and annotations:**
 
   | Alert field | Used as |
   |---|---|
@@ -142,12 +158,30 @@ Knowing the exact behavior is what lets you tune it:
   ```
   :rotating_light: *Kubently diagnosis for `KubePodCrashLooping`*
   ```
+
 - **Failures are logged, never retried into your channel.** A diagnosis that
   errors leaves a log line and no Slack message.
 
+**Where the two paths differ — how a multi-alert payload is handled:**
+
+| | Cloud {% include cloud-badge.html %} | Self-hosted |
+|---|---|---|
+| Firing alerts in one payload | **Grouped into a single diagnosis** | **Diagnosed separately**, up to 3 |
+| Slack output | One thread root for the payload | One message per diagnosed alert |
+| Cap | A per-payload cap applies | `MAX_ALERTS_PER_PAYLOAD` = 3; extras are dropped with a logged warning naming the count |
+| Metering | One unit per payload | n/a |
+| Response | — | ACKs `202` with `{"accepted": <n>}`; diagnosis runs in the background because it takes minutes |
+
+That difference matters for how you group. On **Cloud**, a payload carrying
+five related alerts becomes one investigation that sees all five and one
+Slack thread to reply into — grouping *more* aggressively gives the agent
+more context for the same cost. On **self-hosted**, the same payload produces
+three separate diagnoses and silently drops the other two, so grouping is
+about staying under the cap.
+
 ## 4. Tuning the noise
 
-The 3-per-payload cap and the grouping settings interact directly.
+Per-payload caps and Alertmanager's grouping settings interact directly.
 
 **Group so that a payload is one problem.** `group_by: ['alertname',
 'cluster', 'namespace']` means a hundred pods crashlooping in one namespace
@@ -174,6 +208,20 @@ in `payments` check the DB pool before it blames traffic.
 
 ## Verify
 
+**Cloud** {% include cloud-badge.html %} — post a synthetic payload straight
+at your hook URL; no headers needed:
+
+```bash
+curl -X POST https://<cloud-host>/hooks/alertmanager/<hook-id> \
+  -H 'Content-Type: application/json' \
+  -d '{"alerts":[{"status":"firing",
+        "labels":{"alertname":"KubePodCrashLooping","cluster":"prod-east",
+                  "namespace":"shop","pod":"checkout-api-7d9f-abcde"},
+        "annotations":{"summary":"Pod is restarting repeatedly"}}]}'
+```
+
+**Self-hosted:**
+
 ```bash
 # The API mounted the webhook
 kubectl logs -n kubently deploy/kubently-api | grep "Alertmanager webhook mounted"
@@ -196,9 +244,11 @@ The `202` means accepted, not diagnosed. Watch the API logs for
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `503 SLACK_WEBHOOK_URL is not configured` | The webhook secret isn't wired | Set `api.slackWebhook.existingSecret` and upgrade |
+| Cloud: Alertmanager reports 404 on the hook | Wrong or rotated `hook_id` | Re-copy the hook URL from the dashboard |
+| Cloud: five related alerts produced one diagnosis, not five | Cloud groups a payload into a single investigation | Working as designed — it sees all five at once |
+| `503 SLACK_WEBHOOK_URL is not configured` | Self-hosted: the webhook secret isn't wired | Set `api.slackWebhook.existingSecret` and upgrade |
 | `202 {"accepted":0}` | No alert in the payload had `status: "firing"` | Check the payload; resolved alerts are skipped by design |
-| Only some alerts in a burst get diagnosed | The 3-per-payload cap fired | Expected — check the API log warning, then widen `group_by` or narrow the route |
+| Self-hosted: only some alerts in a burst get diagnosed | The 3-per-payload cap fired | Expected — check the API log warning, then widen `group_by` or narrow the route |
 | Diagnosis is vague about which cluster | The alert carries no `cluster` label | Add `cluster` (and `namespace`/`pod`) labels via Prometheus `external_labels` or relabeling |
 | Nothing arrives and nothing is logged | Alertmanager isn't reaching the endpoint | `amtool config routes test`; check ingress and the `X-API-Key` header |
 | Slack message is full of `**bold**` and `#` headings | Something other than Kubently is posting | The alert path formats for Slack mrkdwn; check the source of the message |
