@@ -77,12 +77,34 @@ one, so rotate on your Git host in the same sitting.
 
 ### What it does with each event
 
-**A failed pipeline** → one agent diagnosis, posted to Slack. Repeats of the
-**same workflow and branch** inside a dedup window collapse to one diagnosis,
-so a flapping job doesn't become a flapping channel. Each diagnosis meters as
-one unit.
+**A failed pipeline** → one agent diagnosis, posted to Slack, metered as one
+unit — subject to dedup.
 
-**A successful deploy** → if you enabled **verify deploys** *and* the repo →
+**A successful deploy** → see [the verification bridge](#the-verification-request)
+below.
+
+#### The dedup window
+
+Exactly **one diagnosis per (tenant, workflow, branch) per window**. The
+window defaults to **900 seconds (15 minutes)** and is overridable with
+`CICD_DEDUPE_SECONDS`. Mechanically it is a Redis `SET NX` with that TTL,
+keyed on the tenant, the workflow, and the branch. A duplicate is **ACKed and
+dropped** — no diagnosis, no Slack message, no quota unit.
+
+<div class="alert alert-warning">
+⚠️ <strong>The key deliberately does not include the commit SHA.</strong>
+That is what makes a flapping job stop flapping your channel — a failing
+workflow re-run on the same branch is silenced. But it also means a
+<em>new commit</em> to the same branch inside the window is deduped too: push
+a fix, watch it fail differently, and you get no diagnosis until the window
+expires. If your team pushes fix-forward commits in tight loops, lower
+<code>CICD_DEDUPE_SECONDS</code>; if a noisy nightly job dominates the
+channel, raise it.
+</div>
+
+#### The deploy-verification bridge
+
+On a **successful deploy**, if you enabled **verify deploys** *and* the repo →
 cluster/namespace/workload mapping resolves for that repository, the hook
 bridges into [deployment verification](#the-verification-request) — the same
 investigation and the same PASS/FAIL verdict described below. If no mapping
@@ -367,7 +389,8 @@ Identical on both paths — Cloud's bridge runs the same investigation.
 |---|---|---|
 | Cloud: Git host shows the webhook delivering but nothing happens | Signature mismatch — the secret on the Git host isn't the one on the CI/CD card | Re-copy the secret from **Settings → CI/CD**; redeliver the event from the Git host |
 | Cloud: failures diagnosed, successful deploys never verified | "Verify deploys" is off, or no mapping resolves for that repo | Enable the toggle and add a repo → cluster/namespace/workload row in the mapping editor |
-| Cloud: a flapping job posts once, not every run | The dedup window collapsed repeats of the same workflow+branch | Working as designed |
+| Cloud: a flapping job posts once, not every run | The dedup window (default 900s) collapsed repeats of the same workflow+branch | Working as designed |
+| Cloud: pushed a fix, it failed again, no new diagnosis | Dedup is keyed on (tenant, workflow, branch) and **not** the commit SHA, so a new commit inside the window is deduped too | Wait out the window, or lower `CICD_DEDUPE_SECONDS` |
 | Cloud: wrong events arriving | GitHub needs **Workflow runs** + **Deployment statuses**; GitLab needs **Pipeline events** | Fix the event selection on the Git host |
 | `400 'cluster' is not a valid cluster id` | Typo, or the id doesn't match `executor.clusterId` | `kubently admin` → List Clusters |
 | `400 'kind' contradicts workload prefix` | You sent both `kind: statefulset` and `workload: deploy/x` | Send one or the other |

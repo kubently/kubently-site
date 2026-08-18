@@ -162,31 +162,45 @@ Knowing the exact behavior is what lets you tune it.
 - **Failures are logged, never retried into your channel.** A diagnosis that
   errors leaves a log line and no Slack message.
 
-**Where the two paths differ — how a multi-alert payload is handled:**
+**The per-payload cap is the same on both paths.** `MAX_ALERTS_PER_PAYLOAD`
+is **3** — a code constant with no environment override. Only the first 3
+firing alerts in a single Alertmanager payload are diagnosed; **the rest are
+dropped.** Cloud deliberately mirrors the OSS constant of the same name in
+`kubently.modules.webhook.alertmanager`, so the number does not change when
+you move between paths.
+
+**What differs is what happens to those (up to) 3:**
 
 | | Cloud {% include cloud-badge.html %} | Self-hosted |
 |---|---|---|
-| Firing alerts in one payload | **Grouped into a single diagnosis** | **Diagnosed separately**, up to 3 |
+| The 3 diagnosed alerts | **Grouped into a single diagnosis** | **Diagnosed separately** — up to 3 investigations |
 | Slack output | One thread root for the payload | One message per diagnosed alert |
-| Cap | A per-payload cap applies | `MAX_ALERTS_PER_PAYLOAD` = 3; extras are dropped with a logged warning naming the count |
 | Metering | One unit per payload | n/a |
+| Dropped alerts | Silently dropped beyond the cap | Dropped, with a logged warning naming the count |
 | Response | — | ACKs `202` with `{"accepted": <n>}`; diagnosis runs in the background because it takes minutes |
 
-That difference matters for how you group. On **Cloud**, a payload carrying
-five related alerts becomes one investigation that sees all five and one
-Slack thread to reply into — grouping *more* aggressively gives the agent
-more context for the same cost. On **self-hosted**, the same payload produces
-three separate diagnoses and silently drops the other two, so grouping is
-about staying under the cap.
+Two consequences worth internalizing:
+
+- **A payload of ten alerts loses seven, on either path.** Grouping is not a
+  way to hand the agent more evidence — past three, it is a way to lose
+  alerts. Group so that a payload *is* one problem, and keep the alerts that
+  reach Kubently few and meaningful.
+- **On Cloud the surviving 3 are correlated in one investigation** and cost
+  one unit; self-hosted runs them as three unrelated investigations that
+  never see each other's evidence. That is the real advantage of the Cloud
+  path here, not extra capacity.
 
 ## 4. Tuning the noise
 
-Per-payload caps and Alertmanager's grouping settings interact directly.
+The 3-alerts-per-payload cap and Alertmanager's grouping settings interact
+directly, and the cap is not configurable — so grouping is your only lever.
 
 **Group so that a payload is one problem.** `group_by: ['alertname',
 'cluster', 'namespace']` means a hundred pods crashlooping in one namespace
-arrive as one group, and Kubently investigates it once. Grouping by `pod`
-would send a hundred payloads.
+arrive as one group with one alert, and Kubently investigates it once.
+Grouping by `pod` would send a hundred payloads. Grouping so loosely that ten
+*different* alertnames share a payload is the other failure — seven of them
+are dropped.
 
 **Don't route everything.** An alert that is actionable-by-definition (disk
 full, cert expiring) doesn't need a root-cause investigation — route those to
@@ -245,10 +259,10 @@ The `202` means accepted, not diagnosed. Watch the API logs for
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | Cloud: Alertmanager reports 404 on the hook | Wrong or rotated `hook_id` | Re-copy the hook URL from the dashboard |
-| Cloud: five related alerts produced one diagnosis, not five | Cloud groups a payload into a single investigation | Working as designed — it sees all five at once |
+| Cloud: three related alerts produced one diagnosis, not three | Cloud groups a payload's diagnosed alerts into a single investigation | Working as designed — one thread, one unit, and they are correlated |
 | `503 SLACK_WEBHOOK_URL is not configured` | Self-hosted: the webhook secret isn't wired | Set `api.slackWebhook.existingSecret` and upgrade |
 | `202 {"accepted":0}` | No alert in the payload had `status: "firing"` | Check the payload; resolved alerts are skipped by design |
-| Self-hosted: only some alerts in a burst get diagnosed | The 3-per-payload cap fired | Expected — check the API log warning, then widen `group_by` or narrow the route |
+| Only some alerts in a burst get diagnosed | The 3-per-payload cap fired (both paths) | Expected. Self-hosted logs a warning naming the count; adjust `group_by` or narrow the route so fewer distinct alerts share a payload |
 | Diagnosis is vague about which cluster | The alert carries no `cluster` label | Add `cluster` (and `namespace`/`pod`) labels via Prometheus `external_labels` or relabeling |
 | Nothing arrives and nothing is logged | Alertmanager isn't reaching the endpoint | `amtool config routes test`; check ingress and the `X-API-Key` header |
 | Slack message is full of `**bold**` and `#` headings | Something other than Kubently is posting | The alert path formats for Slack mrkdwn; check the source of the message |
