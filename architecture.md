@@ -126,8 +126,10 @@ executor-results:{command_id}   # Command results
 
 The API also hosts the webhook surface that drives Kubently without a human
 asking: Alertmanager diagnosis, deployment verification (triggered from CI
-or by a workload label), scheduled checks, and fleet health digests — each running the
-same agent investigation loop and posting results to Slack. Supporting
+or by a workload label), scheduled checks, and fleet health digests — each
+running the same agent investigation loop and posting results to Slack.
+Kubently Cloud adds per-tenant capability hooks in front of this surface
+(Alertmanager and CI/CD), which bridge into the same investigations. Supporting
 modules add operator runbook injection, incident history (searchable past
 diagnoses, namespaced per caller), and optional propose-only GitOps PR
 remediation, which runs API-side so executors never hold a Git token. See

@@ -248,7 +248,7 @@ subtitle: AI SRE for Kubernetes — alerts in, diagnosed root causes out
           </svg>
         </div>
         <h3 class="feature-card__title">CI/CD verification</h3>
-        <p class="feature-card__desc">Post-deploy verification from GitHub Actions or GitLab CI — a PASS/FAIL verdict with evidence, or label a workload and skip CI entirely.</p>
+        <p class="feature-card__desc">Failed pipelines diagnosed, successful deploys verified — a PASS/FAIL verdict with evidence, or label a workload and skip CI entirely.</p>
       </div>
 
       <!-- 4: Scheduled checks -->
@@ -366,8 +366,11 @@ mcpServers:
         </div>
         <p class="connect-card__desc">Sign up, install the outbound-only executor with one Helm command, and chat with your cluster immediately. Organizations, roles, the Slack app, and BYO-MCP integrations come managed.</p>
         <pre class="connect-code" aria-label="Cloud install"><code># after signing up at cloud.kubently.io
-helm install kubently-executor kubently/executor \
-  --set token=&lt;your-tenant-token&gt;   # outbound-only</code></pre>
+helm install kubently-agent kubently/kubently \
+  --namespace kubently-system --create-namespace \
+  --set api.enabled=false --set redis.enabled=false \
+  --set executor.enabled=true \
+  --set executor.token=&lt;token&gt;   # outbound-only</code></pre>
         <a class="connect-guide-link" href="https://cloud.kubently.io">Start free &rarr;</a>
       </div>
 

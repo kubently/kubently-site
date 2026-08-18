@@ -19,7 +19,7 @@ then prerequisites, copy-paste steps, verification, and troubleshooting.
 ## Proactive operations
 
 - **[Alert-triggered diagnosis](/guides/alerts/)** — Alertmanager → diagnosed RCA in Slack.
-- **[CI/CD integration](/guides/cicd/)** — deployment verification from GitHub Actions and GitLab CI.
+- **[CI/CD integration](/guides/cicd/)** — failed pipelines diagnosed, successful deploys verified.
 - **[Proactive checks](/guides/scheduled-checks/)** — cron-scheduled investigations and fleet digests; quiet when healthy.
 
 ## Evidence sources

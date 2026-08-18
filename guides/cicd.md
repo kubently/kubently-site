@@ -1,42 +1,134 @@
 ---
 layout: page
 title: CI/CD Integration
-subtitle: Every deploy verified by a real investigation, from your pipeline.
+subtitle: Failed pipelines diagnosed; deployments verified after they land.
 permalink: /guides/cicd/
 ---
 
-Add one step to the end of your deploy job and Kubently watches the rollout
-settle, then runs a real post-deploy investigation — pods ready? events clean?
-errors in the new logs? metrics regressed against the pre-deploy window? — and
-posts a **PASS/FAIL verdict with the evidence** to Slack.
+Two things connect Kubently to your delivery pipeline:
+
+- **Failed pipelines get diagnosed.** A broken deploy job triggers an agent
+  investigation of the cluster behind it, and the root cause lands in Slack.
+- **Successful deploys get verified.** Kubently watches the rollout settle,
+  then runs a real post-deploy investigation — pods ready? events clean?
+  errors in the new logs? metrics regressed against the pre-deploy window? —
+  and posts a **PASS/FAIL verdict with the evidence**.
 
 A rollout that never settled cannot be talked into a PASS.
 
-<div class="alert alert-info">
-📝 <strong>Scope note.</strong> The engine exposes one CI-facing endpoint:
-<code>POST /webhooks/verify-deployment</code>. There is <strong>no separate
-"pipeline failure" webhook</strong> in the open-source engine today — a failed
-deploy job integrates through the same endpoint (see
-<a href="#when-the-deploy-job-fails">When the deploy job fails</a>). The other
-webhooks — <code>/webhooks/alertmanager</code>,
-<code>/webhooks/fleet-report</code>, <code>/webhooks/scheduled-check</code> —
-are covered in the <a href="/guides/alerts/">alerts</a> and
-<a href="/guides/scheduled-checks/">scheduled checks</a> guides.
+How you wire this depends on your path:
+
+| | Cloud {% include cloud-badge.html %} | Self-hosted |
+|---|---|---|
+| Pipeline failures | `POST /hooks/cicd/{hook_id}` — a per-tenant hook your Git host posts to | No pipeline-failure endpoint; call verification from the failure path of your job |
+| Deploy verification | Bridged automatically from the same hook, or called directly | `POST /webhooks/verify-deployment` from your pipeline |
+| Repo → cluster mapping | Dashboard mapping editor | Pipeline-side (job env or matrix) |
+| Auth | Capability URL + provider signature | `X-API-Key` |
+
+---
+
+## Cloud: the CI/CD hook {% include cloud-badge.html %}
+
+One webhook on your repository covers both directions.
+
+### Set it up
+
+In the dashboard at [cloud.kubently.io](https://cloud.kubently.io), go to
+**Settings → CI/CD**. The card gives you:
+
+- your **webhook URL** — `https://<cloud-host>/hooks/cicd/{hook_id}`, where
+  `hook_id` is an unguessable per-tenant capability URL,
+- a **webhook secret** to paste into your Git host,
+- a **"verify deploys" toggle**, and
+- a **repo → cluster mapping editor**.
+
+Then add the webhook on your Git host.
+
+**GitHub** — repository (or organization) **Settings → Webhooks → Add
+webhook**:
+
+| Field | Value |
+|---|---|
+| Payload URL | your `https://<cloud-host>/hooks/cicd/{hook_id}` |
+| Content type | `application/json` |
+| Secret | the webhook secret from the CI/CD card |
+| Events | **Workflow runs** and **Deployment statuses** |
+
+**GitLab** — project **Settings → Webhooks → Add new webhook**:
+
+| Field | Value |
+|---|---|
+| URL | your `https://<cloud-host>/hooks/cicd/{hook_id}` |
+| Secret token | the webhook secret from the CI/CD card |
+| Trigger | **Pipeline events** |
+
+### How it authenticates
+
+Two independent factors, and both must hold:
+
+1. **The capability URL** — `hook_id` is unguessable and per-tenant, the same
+   model as a Slack incoming webhook. That is what lets your Git host post
+   without custom auth headers.
+2. **The provider signature** — GitHub's HMAC signature, or GitLab's secret
+   token, verified against your tenant's webhook secret.
+
+Rotating the secret in the CI/CD card invalidates signatures from the old
+one, so rotate on your Git host in the same sitting.
+
+### What it does with each event
+
+**A failed pipeline** → one agent diagnosis, posted to Slack, metered as one
+unit — subject to dedup.
+
+**A successful deploy** → see [the verification bridge](#the-verification-request)
+below.
+
+#### The dedup window
+
+Exactly **one diagnosis per (tenant, workflow, branch) per window**. The
+window defaults to **900 seconds (15 minutes)** and is overridable with
+`CICD_DEDUPE_SECONDS`. Mechanically it is a Redis `SET NX` with that TTL,
+keyed on the tenant, the workflow, and the branch. A duplicate is **ACKed and
+dropped** — no diagnosis, no Slack message, no quota unit.
+
+<div class="alert alert-warning">
+⚠️ <strong>The key deliberately does not include the commit SHA.</strong>
+That is what makes a flapping job stop flapping your channel — a failing
+workflow re-run on the same branch is silenced. But it also means a
+<em>new commit</em> to the same branch inside the window is deduped too: push
+a fix, watch it fail differently, and you get no diagnosis until the window
+expires. If your team pushes fix-forward commits in tight loops, lower
+<code>CICD_DEDUPE_SECONDS</code>; if a noisy nightly job dominates the
+channel, raise it.
 </div>
 
-## Prerequisites
+#### The deploy-verification bridge
 
-- A connected executor in each target cluster ([quickstart](/guides/quick-start/)).
-- Slack delivery configured — `api.slackWebhook` self-hosted, or the managed
-  [Slack app](/cloud/slack-app/) {% include cloud-badge.html %}. See
-  [alerts](/guides/alerts/#1-slack-delivery). Verifications **always post**;
-  a deploy is an event someone is actively watching, so silence is not a
-  signal here.
-- A Kubently API key stored as a CI secret.
-- Optional but recommended: [Prometheus wired up](/guides/observability/) —
-  it is what lets the verdict compare metrics against the pre-deploy window.
+On a **successful deploy**, if you enabled **verify deploys** *and* the repo →
+cluster/namespace/workload mapping resolves for that repository, the hook
+bridges into [deployment verification](#the-verification-request) — the same
+investigation and the same PASS/FAIL verdict described below. If no mapping
+resolves, nothing runs; that's the switch, not a failure.
 
-## The request
+### The repo → cluster mapping
+
+Kubently addresses clusters by the cluster id the executor registered with,
+so something has to say *this repository deploys to that workload*. In Cloud
+that lives in the mapping editor on the CI/CD card — repository → cluster,
+namespace, workload — and it is what the deploy-verification bridge consults.
+Add a row per environment a repo deploys to.
+
+Confirm the cluster ids you're mapping to on the dashboard's clusters page,
+or see [multi-cluster](/guides/multi-cluster/).
+
+---
+
+## Self-hosted: verification from your pipeline
+
+There is no per-tenant hook self-hosted. Call the OSS verification endpoint
+directly from the job that deployed.
+
+### The verification request
 
 ```bash
 curl -X POST https://<your-kubently-host>/webhooks/verify-deployment \
@@ -49,8 +141,6 @@ curl -X POST https://<your-kubently-host>/webhooks/verify-deployment \
 {"accepted": true, "cluster": "prod-east", "workload": "deployment/checkout-api",
  "namespace": "shop", "timeoutSeconds": 600}
 ```
-
-### Fields
 
 | Field | Required | Notes |
 |---|---|---|
@@ -80,11 +170,11 @@ curl -X POST https://<your-kubently-host>/webhooks/verify-deployment \
        "workload": "deploy/checkout-api", "dry_run": true}' | jq -r .answer
 ```
 
-## GitHub Actions
+### GitHub Actions
 
-A complete deploy-and-verify workflow. The repo→cluster mapping lives in the
-workflow, because Kubently identifies clusters by the executor's cluster id —
-there is nothing to configure on the Kubently side.
+A complete deploy-and-verify workflow. The repo → cluster mapping lives in
+the workflow, next to the credentials that already decide where a repo
+deploys.
 
 {% raw %}
 ```yaml
@@ -141,8 +231,9 @@ jobs:
           }
           JSON
 
-      # Optional: when the deploy step itself failed, ask for an investigation
-      # of what the cluster looks like now, with the CI context attached.
+      # The deploy step failed: ask for an investigation of what the cluster
+      # looks like now, with the CI context attached. (This is the
+      # self-hosted stand-in for the Cloud CI/CD hook's failure path.)
       - name: Investigate failed deploy
         if: failure()
         run: |
@@ -166,7 +257,7 @@ jobs:
 Store `KUBENTLY_API_KEY` as a repository **secret** and `KUBENTLY_URL` as a
 repository **variable**.
 
-## GitLab CI
+### GitLab CI
 
 ```yaml
 # .gitlab-ci.yml
@@ -217,39 +308,16 @@ investigate-failure:
 
 Set `KUBENTLY_URL` and `KUBENTLY_API_KEY` as masked CI/CD variables.
 
-## When the deploy job fails
+On the failure path, two things change from the success path: a short
+`timeout_seconds` (the rollout has already failed — don't wait 15 minutes to
+confirm it), and a `query` telling the agent this came from a broken pipeline
+and what to look at first. The verdict will be FAIL, and the evidence trail
+is the part you actually want.
 
-There is no dedicated pipeline-failure endpoint in the engine, and you don't
-need one: a failed deploy is still a workload in a known cluster and
-namespace, which is exactly what `/webhooks/verify-deployment` takes. Both
-examples above use the same endpoint on the failure path, with two changes:
-
-- a short `timeout_seconds` (the rollout has already failed — don't wait 15
-  minutes to confirm it), and
-- a `query` that tells the agent this came from a broken pipeline and what to
-  look at first.
-
-The verdict will be FAIL, and the evidence trail is the part you actually
-want.
-
-## The repo → cluster mapping
-
-Kubently addresses clusters by the **cluster id** the executor registered
-with (`executor.clusterId`). There is no repo registry on the Kubently side —
-the mapping belongs in your pipeline, next to the credentials that already
-decide where a repo deploys.
-
-Two shapes work well:
-
-```yaml
-# 1. Per-environment job env (the examples above)
-env:
-  KUBENTLY_CLUSTER: prod-east
-```
+### Matrix: one repo, many clusters
 
 {% raw %}
 ```yaml
-# 2. Matrix, for a repo that deploys to a fleet
 strategy:
   matrix:
     include:
@@ -266,20 +334,20 @@ steps:
 ```
 {% endraw %}
 
-Confirm the ids you're mapping to with `kubently admin` → *List Clusters*, or
-see [multi-cluster](/guides/multi-cluster/).
+Confirm the ids with `kubently admin` → *List Clusters*.
+
+---
 
 ## No CI access? Label the workload instead
 
-If you can't (or don't want to) touch the pipeline, let the API notice deploys
-itself. Label the workload and enable the watch:
+Works on both paths. Let the API notice deploys itself:
 
 ```bash
 kubectl -n shop label deploy/checkout-api kubently.io/verify=enabled
 ```
 
 ```yaml
-# values.yaml
+# values.yaml (self-hosted)
 verifyDeployment:
   watch:
     enabled: true
@@ -299,6 +367,8 @@ The chart renders this into `KUBENTLY_VERIFY_WATCH_SECONDS` (sweep interval;
 
 ## Verdict semantics
 
+Identical on both paths — Cloud's bridge runs the same investigation.
+
 - The API polls `kubectl rollout status --watch=false` through the executor
   channel until the rollout is **complete**, **failed**, or your deadline
   passes.
@@ -309,15 +379,23 @@ The chart renders this into `KUBENTLY_VERIFY_WATCH_SECONDS` (sweep interval;
   parser tolerates case, model decoration and short preambles; anything it
   cannot read maps to **unknown**, which is treated like a failure for
   posting purposes. **An unparseable verdict never mutes a notification.**
+- **Verifications always post** — pass or fail. A deploy is an event someone
+  is actively watching, so silence is not a signal here (contrast
+  [scheduled checks](/guides/scheduled-checks/), which stay quiet on pass).
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
+| Cloud: Git host shows the webhook delivering but nothing happens | Signature mismatch — the secret on the Git host isn't the one on the CI/CD card | Re-copy the secret from **Settings → CI/CD**; redeliver the event from the Git host |
+| Cloud: failures diagnosed, successful deploys never verified | "Verify deploys" is off, or no mapping resolves for that repo | Enable the toggle and add a repo → cluster/namespace/workload row in the mapping editor |
+| Cloud: a flapping job posts once, not every run | The dedup window (default 900s) collapsed repeats of the same workflow+branch | Working as designed |
+| Cloud: pushed a fix, it failed again, no new diagnosis | Dedup is keyed on (tenant, workflow, branch) and **not** the commit SHA, so a new commit inside the window is deduped too | Wait out the window, or lower `CICD_DEDUPE_SECONDS` |
+| Cloud: wrong events arriving | GitHub needs **Workflow runs** + **Deployment statuses**; GitLab needs **Pipeline events** | Fix the event selection on the Git host |
 | `400 'cluster' is not a valid cluster id` | Typo, or the id doesn't match `executor.clusterId` | `kubently admin` → List Clusters |
 | `400 'kind' contradicts workload prefix` | You sent both `kind: statefulset` and `workload: deploy/x` | Send one or the other |
 | `400 'workload' is not a valid resource name` | A `kind/name` prefix that isn't deployment/statefulset/daemonset, or a non-DNS-1123 name | Use the bare name plus an explicit `kind` |
-| `503 SLACK_WEBHOOK_URL is not configured` | Non-dry-run with no Slack destination | Configure `api.slackWebhook`; or use `dry_run: true` while testing |
+| `503 SLACK_WEBHOOK_URL is not configured` | Self-hosted non-dry-run with no Slack destination | Configure `api.slackWebhook`; or use `dry_run: true` while testing |
 | `202` but no Slack message ever arrives | The investigation errored in the background | `kubectl logs -n kubently deploy/kubently-api`; reproduce with `dry_run: true` |
 | Verification times out on a slow rollout | Deadline too short | Raise `timeout_seconds` (max 1800) or `KUBENTLY_VERIFY_TIMEOUT_SECONDS` |
 | Labelled workload never verifies | The watch is off, or the cluster isn't in the list | Set `verifyDeployment.watch.enabled: true`; leave `clusters: []` for all |
@@ -325,7 +403,8 @@ The chart renders this into `KUBENTLY_VERIFY_WATCH_SECONDS` (sweep interval;
 
 ## Related
 
-- [Scheduled checks & fleet digests](/guides/scheduled-checks/) — the same verdict contract, on cron.
+- [Alert-triggered diagnosis](/guides/alerts/) — the same per-tenant hook model, for Alertmanager.
+- [Proactive checks](/guides/scheduled-checks/) — the same verdict contract, on cron.
 - [Change correlation](/guides/change-correlation/) — what makes a FAIL name the revision that caused it.
 - [GitOps remediation](/guides/gitops-remediation/) — from a FAIL to a proposed fix PR.
 - Upstream: [the README's deployment-verification section](https://github.com/kubently/kubently#deployment-verification-did-that-deploy-actually-work)

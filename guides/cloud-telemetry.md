@@ -75,13 +75,24 @@ explicit truncation note into the model's context.
   enabled (`--workload-pool=PROJECT_ID.svc.id.goog`; on by default for
   Autopilot).
 
-Everything below wires IAM to the executor's **ServiceAccount**, which the
-chart names `<release-name>-executor` — `kubently-executor` for a release
-named `kubently`. Confirm before you start:
+Everything below wires IAM to the executor's **ServiceAccount**, so its exact
+name and namespace matter more than anything else on this page. The chart
+names it `<release-name>-executor`:
+
+| Install | Release | Namespace | ServiceAccount |
+|---|---|---|---|
+| Cloud onboarding {% include cloud-badge.html %} | `kubently-agent` | `kubently-system` | `kubently-agent-executor` |
+| Self-hosted (typical) | `kubently` | `kubently` | `kubently-executor` |
+
+**Confirm yours before you start** — a mismatch here is the single most
+common reason the whole setup silently does nothing:
 
 ```bash
-kubectl get serviceaccounts -n kubently
+kubectl get serviceaccounts -A | grep executor
 ```
+
+The examples below use `kubently` / `kubently-executor`. Substitute your own
+namespace and ServiceAccount name throughout.
 
 ---
 
@@ -479,13 +490,35 @@ executor:
 ```
 
 ```bash
-helm upgrade kubently-executor kubently/kubently \
+# self-hosted release name/namespace; use kubently-agent / kubently-system on Cloud
+helm upgrade kubently kubently/kubently \
   --namespace kubently --reuse-values -f cloud-values.yaml
 ```
 
-The chart renders these into `KUBENTLY_CLOUD_MODE`,
-`KUBENTLY_CLOUD_REFRESH_INTERVAL`, and (when set) `KUBENTLY_CLOUD_AWS_REGION`
-/ `KUBENTLY_CLOUD_GCP_PROJECT`.
+### The environment variables behind those values
+
+The chart renders the block above into these. You can also set them directly
+outside Helm.
+
+| Variable | Default | Values / meaning |
+|---|---|---|
+| `KUBENTLY_CLOUD_MODE` | `off` | `off` (feature disabled), `auto` (try AWS, then GCP), `aws`, `gcp`. Rendered from `executor.cloud.provider` when `executor.cloud.enabled` is true |
+| `KUBENTLY_CLOUD_REFRESH_INTERVAL` | `3600` | Seconds between identity/permission re-detection |
+| `KUBENTLY_CLOUD_AWS_REGION` | — | Overrides the region; auto-detected on EKS |
+| `KUBENTLY_CLOUD_GCP_PROJECT` | — | Overrides the project; auto-detected on GKE |
+
+<div class="alert alert-info">
+📝 These four are absent from upstream
+<a href="https://github.com/kubently/kubently/blob/main/docs/ENVIRONMENT_VARIABLES.md"><code>docs/ENVIRONMENT_VARIABLES.md</code></a>
+today — a known gap in the engine's env-var reference, not a sign they are
+unsupported. They are real and live in <code>sse_executor.py</code>, the
+executor Dockerfile, and the executor Deployment template.
+</div>
+
+**If the cloud SDKs aren't present in the executor image**, enabling the mode
+logs a warning and the feature stays disabled — it degrades rather than
+crash-looping the pod. Check the executor logs if you enabled it and see no
+identity line at all.
 
 <div class="alert alert-info">
 💡 <strong>Capability reporting turns itself on.</strong> The agent discovers
