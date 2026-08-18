@@ -1,73 +1,48 @@
 ---
 layout: page
 title: Guides
+subtitle: Task-oriented guides for everything the agent can do.
 permalink: /guides/
 ---
 
-<div class="features">
-  <div class="feature">
-    <span class="feature-icon">🚀</span>
-    <h3 class="feature-title"><a href="quick-start/">Quick Start</a></h3>
-    <p class="feature-description">Get up and running with Kubently in under 10 minutes</p>
-  </div>
+Guides apply to both Kubently Cloud and self-hosted deployments unless marked
+with a {% include cloud-badge.html %} badge. Guides marked *(in progress)*
+have an accurate outline and upstream links today, with the full walkthrough
+on its way.
 
-  <div class="feature">
-    <span class="feature-icon">💻</span>
-    <h3 class="feature-title"><a href="cli/">CLI Guide</a></h3>
-    <p class="feature-description">Interactive terminal interface for debugging Kubernetes clusters</p>
-  </div>
+## Getting started
 
-  <div class="feature">
-    <span class="feature-icon">📖</span>
-    <h3 class="feature-title"><a href="basic-usage/">Basic Usage</a></h3>
-    <p class="feature-description">Learn fundamental concepts and everyday operations</p>
-  </div>
+- **[Cloud quickstart](/docs/cloud-quickstart/)** {% include cloud-badge.html %} — signup to first diagnosis in minutes.
+- **[Self-hosted quickstart](/guides/quick-start/)** — `kubently install` to a working debug chat.
+- **[Basic usage](/guides/basic-usage/)** — asking good questions, reading diagnoses.
+- **[CLI guide](/guides/cli/)** — the interactive terminal client.
 
-  <div class="feature">
-    <span class="feature-icon">🤖</span>
-    <h3 class="feature-title"><a href="multi-agent/">Multi-Agent Systems</a></h3>
-    <p class="feature-description">Integration with AI agents and A2A communication</p>
-  </div>
-  
-  <div class="feature">
-    <span class="feature-icon">🔒</span>
-    <h3 class="feature-title"><a href="security/">Security Guide</a></h3>
-    <p class="feature-description">Security best practices for production deployments</p>
-  </div>
-  
-  <div class="feature">
-    <span class="feature-icon">🔧</span>
-    <h3 class="feature-title"><a href="troubleshooting/">Troubleshooting</a></h3>
-    <p class="feature-description">Common issues, diagnostics, and solutions</p>
-  </div>
-  
-  <div class="feature">
-    <span class="feature-icon">⚡</span>
-    <h3 class="feature-title">Performance Tuning</h3>
-    <p class="feature-description">Optimize Kubently for your environment (coming soon)</p>
-  </div>
-</div>
+## Proactive operations
 
-## Advanced Usage
+- **[Alert-triggered diagnosis](/guides/alerts/)** *(in progress)* — Alertmanager → diagnosed RCA in Slack.
+- **[CI/CD integration](/guides/cicd/)** *(in progress)* — GitHub Actions / GitLab failure webhooks and deployment verification.
+- **[Scheduled checks & fleet digests](/guides/scheduled-checks/)** *(in progress)* — cron-scheduled investigations; quiet when healthy.
 
-- [Multi-Agent Systems](multi-agent.md) - Integration with AI agents and A2A communication
-- [Security Best Practices](security.md) - Secure deployment and configuration
-- [Performance Tuning](performance.md) - Optimize Kubently for your environment
+## Evidence sources
 
-## Operations
+- **[Metrics & logs](/guides/observability/)** *(in progress)* — Prometheus, multi-pod log search, and Loki.
+- **[Change correlation](/guides/change-correlation/)** *(in progress)* — rollout, Helm, ArgoCD, and event timelines.
+- **[Cloud telemetry](/guides/cloud-telemetry/)** *(in progress)* — CloudWatch / Cloud Logging via workload identity, zero stored credentials.
 
-- [Monitoring](monitoring.md) - Monitor Kubently deployment and usage
-- [Troubleshooting](troubleshooting.md) - Common issues and solutions
-- [Upgrading](upgrading.md) - Upgrade procedures and considerations
+## Knowledge & follow-through
 
-## Use Cases
+- **[Operator runbooks](/guides/runbooks/)** *(in progress)* — your tribal knowledge, injected into investigations.
+- **[Incident history & postmortems](/guides/incidents/)** *(in progress)* — searchable past diagnoses and postmortem export.
+- **[GitOps remediation](/guides/gitops-remediation/)** *(in progress)* — propose-only PRs against your manifests repo.
 
-- [Production Debugging](production-debugging.md) - Safe debugging in production environments
-- [Development Workflows](development-workflows.md) - Integrate Kubently into development processes
-- [Automated Diagnostics](automated-diagnostics.md) - Build automated diagnostic workflows
+## Fleet & interop
 
-## Integration
+- **[Multi-cluster fleets](/guides/multi-cluster/)** *(in progress)* — registering executors across clusters; fleet fan-out questions.
+- **[Multi-agent systems](/guides/multi-agent/)** — Kubently inside larger agent systems.
+- **[A2A integration](/guides/a2a-integration/)** — the agent-to-agent protocol surface.
 
-- [CI/CD Integration](cicd.md) - Use Kubently in continuous integration pipelines
-- [Monitoring Systems](monitoring-integration.md) - Integrate with existing monitoring solutions
-- [Custom Tools](custom-tools.md) - Build custom tools on top of Kubently
+## Operations & safety
+
+- **[Security](/guides/security/)** — the allowlist/RBAC/auth model and hardening.
+- **[Troubleshooting](/guides/troubleshooting/)** — when Kubently itself misbehaves.
+- **[Installation](/installation/)** — self-hosted install in depth.
