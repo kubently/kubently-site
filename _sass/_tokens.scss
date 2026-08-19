@@ -1,0 +1,62 @@
+/* =========================================================================
+   Kubently design tokens - SHARED SOURCE OF TRUTH
+   -------------------------------------------------------------------------
+   This file is consumed by two surfaces and must stay byte-identical in both:
+
+     canonical : kubently/kubently-site   _sass/_tokens.scss   <- edit here
+     vendored  : kubently/kubently-cloud  dashboard/app/tokens.css
+
+   kubently-cloud's CI diffs its copy against this one on every PR and daily,
+   and fails on any difference. Change a colour here, then copy the file over
+   in a kubently-cloud PR - the two land together.
+
+   Two constraints on what may go in this file:
+
+   1. Pure CSS. No SassScript, no interpolation - the same bytes have to be
+      valid as a Sass partial here and as a plain stylesheet there.
+   2. ASCII only. jekyll-sass-converter reads imported partials as US-ASCII,
+      so a stray em dash or curly quote fails the site build with
+      "Invalid US-ASCII character".
+   ========================================================================= */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0c10;
+  --bg-deep: #070a0e;
+  --surface: #0d1117;
+  --surface-2: #15191f;
+
+  /* Borders */
+  --border: #1b222b;
+  --border-2: #2c333d;
+
+  /* Text */
+  --text: #e6edf3;
+  --text-muted: #8b97a5;
+
+  /* Accents */
+  --accent: #2dd4bf;   /* teal/mint - matches the logo */
+  --accent-2: #22d3ee;
+
+  /* Status */
+  --ok: #56d364;
+  --warn: #e3b341;
+  --danger: #f47067;
+
+  /* Aliases. The dashboard grew up calling these surfaces "panels" and its
+     muted text "--muted". Aliased rather than renamed so adopting this file
+     stays a no-op refactor on both sides; prefer the canonical names above
+     in new CSS. */
+  --panel: var(--surface);
+  --panel-2: var(--surface-2);
+  --muted: var(--text-muted);
+  --accent-dim: var(--accent-2);
+
+  /* Typography. --font-*-stack is the shared stack; --font-ui / --font-mono
+     are what callers reference. The dashboard overrides those two to put
+     next/font's build-time self-hosted faces in front of the same stack. */
+  --font-ui-stack: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono-stack: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code", "Courier New", monospace;
+  --font-ui: var(--font-ui-stack);
+  --font-mono: var(--font-mono-stack);
+}

@@ -10,34 +10,12 @@
    will consume the tokens below.
    ========================================================================= */
 
-/* ---- Design tokens ------------------------------------------------------ */
-:root {
-  /* Surfaces */
-  --bg: #0a0c10;
-  --bg-deep: #070a0e;
-  --surface: #0d1117;
-  --surface-2: #15191f;
-
-  /* Borders */
-  --border: #1b222b;
-  --border-2: #2c333d;
-
-  /* Text */
-  --text: #e6edf3;
-  --text-muted: #8b97a5;
-
-  /* Accents */
-  --accent: #2dd4bf;   /* teal/mint — matches the logo */
-  --accent-2: #22d3ee;
-
-  /* Status */
-  --ok: #56d364;
-  --warn: #e3b341;
-
-  /* Fonts */
-  --font-ui: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code", "Courier New", monospace;
-}
+/* ---- Design tokens ------------------------------------------------------
+   The :root custom properties live in _sass/_tokens.scss, which is the
+   shared source of truth for kubently.io and cloud.kubently.io. Edit them
+   there, not here; kubently-cloud vendors a byte-identical copy and its CI
+   fails when the two drift. */
+@import "tokens";
 
 /* ---- Modern minimal reset ---------------------------------------------- */
 *,
